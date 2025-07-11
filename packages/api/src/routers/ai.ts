@@ -12,6 +12,7 @@ import { generateUID } from "@kan/shared/utils";
 import {
   getAIConfig,
   interpolatePrompt,
+  interpolateTaskPrompt,
   validateAndCleanAIResponse,
   type AIResponse
 } from "../config/ai";
@@ -97,6 +98,41 @@ const generatePrompt = (projectIdea: string, features: string[]): string => {
     projectIdea,
     features: features.join(", ")
   });
+};
+
+// Clean generated prompt to remove system instructions and meta-content
+const cleanGeneratedPrompt = (prompt: string): string => {
+  if (!prompt) return "";
+
+  let cleaned = prompt;
+
+  // Remove common meta-instruction patterns
+  const metaPatterns = [
+    /^.*You are an expert.*$/gm,
+    /^.*Your goal is to create.*$/gm,
+    /^.*Based on all the context provided.*$/gm,
+    /^.*Respond ONLY with.*$/gm,
+    /^.*without any additional commentary.*$/gm,
+    /^\*\*Overall Project Context:\*\*.*$/gm,
+    /^\*\*Board Context:\*\*.*$/gm,
+    /^\*\*Specific Task Details:\*\*.*$/gm,
+    /^\*\*Your Instructions:\*\*.*$/gm,
+    /^\*\*Output Requirements:\*\*.*$/gm,
+    /^The prompt should:.*$/gm,
+    /^\d+\.\s+.*(?:should|must|include|specify|provide|mention).*$/gm,
+  ];
+
+  metaPatterns.forEach(pattern => {
+    cleaned = cleaned.replace(pattern, '');
+  });
+
+  // Remove template variables that weren't replaced
+  cleaned = cleaned.replace(/\{\{[^}]+\}\}/g, '');
+
+  // Clean up extra whitespace and empty lines
+  cleaned = cleaned.replace(/\n\s*\n\s*\n/g, '\n\n').trim();
+
+  return cleaned;
 };
 
 // Fallback response generator using centralized configuration
@@ -276,6 +312,7 @@ export const aiRouter = createTRPCRouter({
           name: input.boardName,
           createdBy: userId,
           workspaceId: workspace.id,
+          projectIdea: input.projectIdea, // Store project idea for AI prompt generation
         });
 
         if (!board) {
@@ -375,6 +412,121 @@ export const aiRouter = createTRPCRouter({
         console.error("AI plan generation error:", error);
         throw new TRPCError({
           message: "Failed to generate AI plan",
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
+    }),
+
+  generateTaskPrompt: protectedProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/ai/generate-task-prompt",
+        summary: "Generate AI-assisted task prompt",
+        description: "Creates a detailed, context-aware prompt for completing a specific Kanban card task",
+        tags: ["AI"],
+        protect: true,
+      },
+    })
+    .input(z.object({
+      cardPublicId: z.string().min(12),
+    }))
+    .output(z.object({
+      prompt: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user?.id;
+
+      if (!userId) {
+        throw new TRPCError({
+          message: "User not authenticated",
+          code: "UNAUTHORIZED",
+        });
+      }
+
+      try {
+        // Get card details with board context
+        const card = await cardRepo.getWithListAndMembersByPublicId(ctx.db, input.cardPublicId);
+
+        if (!card) {
+          throw new TRPCError({
+            message: "Card not found",
+            code: "NOT_FOUND",
+          });
+        }
+
+        // Get board details including project idea
+        const board = await boardRepo.getWithProjectIdeaByPublicId(ctx.db, card.list.board.publicId);
+
+        if (!board) {
+          throw new TRPCError({
+            message: "Board not found",
+            code: "NOT_FOUND",
+          });
+        }
+
+        // Validate user has access to the workspace
+        await assertUserInWorkspace(ctx.db, userId, board.workspaceId);
+
+        // Prepare context variables for prompt generation
+        const promptVariables = {
+          projectIdea: board.projectIdea || "No project idea available",
+          boardName: board.name,
+          cardTitle: card.title,
+          cardDescription: card.description || "No description provided",
+        };
+
+        // Get AI configuration
+        const config = getAIConfig();
+        const openai = getOpenAIClient();
+
+        // Generate the meta-prompt using the template
+        const metaPrompt = interpolateTaskPrompt(config.taskPromptTemplate, promptVariables);
+
+        console.log(`[AI] Generating task prompt for card: ${card.title}`);
+
+        // Call AI to generate the task prompt
+        const response = await openai.chat.completions.create({
+          model: config.modelId,
+          messages: [
+            {
+              role: "user",
+              content: metaPrompt,
+            },
+          ],
+          temperature: config.taskPromptTemperature,
+          max_tokens: config.taskPromptMaxTokens,
+          top_p: config.topP,
+          frequency_penalty: config.frequencyPenalty,
+          presence_penalty: config.presencePenalty,
+        });
+
+        const rawPrompt = response.choices[0]?.message?.content?.trim();
+
+        if (!rawPrompt) {
+          throw new TRPCError({
+            message: "Failed to generate task prompt",
+            code: "INTERNAL_SERVER_ERROR",
+          });
+        }
+
+        // Clean the generated prompt to remove any meta-instructions or system content
+        const cleanedPrompt = cleanGeneratedPrompt(rawPrompt);
+
+        console.log(`[AI] Successfully generated task prompt (${cleanedPrompt.length} characters)`);
+
+        return {
+          prompt: cleanedPrompt,
+        };
+
+      } catch (error) {
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+
+        console.error("Task prompt generation error:", error);
+        throw new TRPCError({
+          message: "Failed to generate task prompt",
           code: "INTERNAL_SERVER_ERROR",
         });
       }

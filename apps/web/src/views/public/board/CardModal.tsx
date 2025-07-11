@@ -5,6 +5,7 @@ import { HiXMark } from "react-icons/hi2";
 import { authClient } from "@kan/auth/client";
 
 import Editor from "~/components/Editor";
+import Modal from "~/components/modal";
 import { useModal } from "~/providers/modal";
 import { api } from "~/utils/api";
 import ActivityList from "~/views/card/components/ActivityList";
@@ -19,7 +20,7 @@ export function CardModal({
   boardSlug: string | null | undefined;
 }) {
   const router = useRouter();
-  const { closeModal, isOpen } = useModal();
+  const { closeModal, isOpen, openModal, modalContentType } = useModal();
   const { data: session } = authClient.useSession();
 
   const { data, isLoading } = api.card.byId.useQuery(
@@ -67,9 +68,12 @@ export function CardModal({
               </div>
             ) : (
               <>
-                <h1 className="font-medium leading-[2.3rem] tracking-tight text-neutral-900 dark:text-dark-1000 sm:text-[1.2rem]">
-                  {data?.title}
-                </h1>
+                <div className="flex items-center justify-between w-full">
+                  <h1 className="font-medium leading-[2.3rem] tracking-tight text-neutral-900 dark:text-dark-1000 sm:text-[1.2rem]">
+                    {data?.title}
+                  </h1>
+
+                </div>
               </>
             )}
           </div>
@@ -115,6 +119,11 @@ export function CardModal({
           </div>
         </div>
       </div>
+
+      <Modal>
+        {/* No modal content needed for this component anymore */}
+        <></>
+      </Modal>
     </div>
   );
 }

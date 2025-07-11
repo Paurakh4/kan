@@ -334,6 +334,22 @@ export const getWithListIdsByPublicId = (
   });
 };
 
+export const getWithProjectIdeaByPublicId = (
+  db: dbClient,
+  boardPublicId: string,
+) => {
+  return db.query.boards.findFirst({
+    columns: {
+      id: true,
+      publicId: true,
+      name: true,
+      projectIdea: true,
+      workspaceId: true,
+    },
+    where: and(eq(boards.publicId, boardPublicId), isNull(boards.deletedAt)),
+  });
+};
+
 export const getWithLatestListIndexByPublicId = (
   db: dbClient,
   boardPublicId: string,
@@ -366,6 +382,7 @@ export const create = async (
     workspaceId: number;
     importId?: number;
     slug: string;
+    projectIdea?: string;
   },
 ) => {
   const [result] = await db
@@ -377,6 +394,7 @@ export const create = async (
       workspaceId: boardInput.workspaceId,
       importId: boardInput.importId,
       slug: boardInput.slug,
+      projectIdea: boardInput.projectIdea,
     })
     .returning({
       id: boards.id,

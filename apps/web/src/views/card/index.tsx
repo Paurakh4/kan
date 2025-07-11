@@ -3,12 +3,14 @@ import { useRouter } from "next/router";
 import { t } from "@lingui/core/macro";
 import { useForm } from "react-hook-form";
 import { IoChevronForwardSharp } from "react-icons/io5";
+import { HiSparkles } from "react-icons/hi2";
 
+import { AIPromptModal } from "~/components/AIPromptModal";
 import Avatar from "~/components/Avatar";
 import Editor from "~/components/Editor";
 import { LabelForm } from "~/components/LabelForm";
 import LabelIcon from "~/components/LabelIcon";
-import Modal from "~/components/modal";
+import Modal, { ModalSizeProvider } from "~/components/modal";
 import { NewWorkspaceForm } from "~/components/NewWorkspaceForm";
 import { PageHead } from "~/components/PageHead";
 import { useModal } from "~/providers/modal";
@@ -131,7 +133,7 @@ export function CardRightPanel() {
 export default function CardPage() {
   const router = useRouter();
   const utils = api.useUtils();
-  const { modalContentType, entityId } = useModal();
+  const { modalContentType, entityId, openModal } = useModal();
   const { showPopup } = usePopup();
   const { workspace } = useWorkspace();
 
@@ -223,7 +225,7 @@ export default function CardPage() {
                       />
                     </div>
                   </form>
-                  <div className="flex">
+                  <div className="flex items-center gap-2">
                     <Dropdown />
                   </div>
                 </>
@@ -237,6 +239,18 @@ export default function CardPage() {
             {card && (
               <>
                 <div className="mb-10 flex w-full max-w-2xl flex-col justify-between">
+                  {/* AI Prompt Button - Prominent Location */}
+                  <div className="mb-6">
+                    <button
+                      onClick={() => openModal("AI_PROMPT", cardId)}
+                      className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                      title={t`Generate AI prompt for this task`}
+                    >
+                      <HiSparkles className="h-5 w-5" />
+                      <span>{t`Generate AI Prompt`}</span>
+                    </button>
+                  </div>
+
                   <form
                     onSubmit={handleSubmit(onSubmit)}
                     className="w-full space-y-6"
@@ -301,6 +315,11 @@ export default function CardPage() {
             />
           )}
           {modalContentType === "NEW_WORKSPACE" && <NewWorkspaceForm />}
+          {modalContentType === "AI_PROMPT" && (
+            <ModalSizeProvider size="md">
+              <AIPromptModal cardPublicId={cardId ?? ""} />
+            </ModalSizeProvider>
+          )}
         </Modal>
       </div>
     </>
