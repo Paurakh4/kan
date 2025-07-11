@@ -13,6 +13,7 @@ interface UserMenuProps {
   imageUrl: string | undefined;
   email: string;
   isLoading: boolean;
+  collapsed?: boolean;
 }
 
 function classNames(...classes: string[]): string {
@@ -23,6 +24,7 @@ export default function UserMenu({
   imageUrl,
   email,
   isLoading,
+  collapsed = false,
 }: UserMenuProps) {
   const router = useRouter();
   const { themePreference, switchTheme } = useTheme();
@@ -36,25 +38,28 @@ export default function UserMenu({
   const avatarUrl = imageUrl ? getAvatarUrl(imageUrl) : null;
 
   return (
-    <Menu as="div" className="relative inline-block w-full text-left">
+    <Menu as="div" className={classNames("relative inline-block text-left", collapsed ? "w-auto" : "w-full") }>
       <div>
         {isLoading ? (
           <div className="flex">
-            <div className="h-[30px] w-[30px] animate-pulse rounded-full bg-light-200 dark:bg-dark-200" />
-            <div className="mx-2 h-[30px] w-[175px] animate-pulse rounded-md bg-light-200 dark:bg-dark-200" />
+            <div className={collapsed ? "h-7 w-7" : "h-[30px] w-[30px]" + " animate-pulse rounded-full bg-light-200 dark:bg-dark-200"} />
+            {!collapsed && <div className="mx-2 h-[30px] w-[175px] animate-pulse rounded-md bg-light-200 dark:bg-dark-200" />}
           </div>
         ) : (
-          <Menu.Button className="flex w-full items-center rounded-md p-1.5 text-neutral-900 hover:bg-light-200 dark:text-dark-900 dark:hover:bg-dark-200 dark:hover:text-dark-1000">
+          <Menu.Button className={classNames(
+            "flex items-center rounded-full focus:outline-none",
+            collapsed ? "justify-center h-7 w-7 p-0 bg-light-200 dark:bg-dark-200" : "w-full rounded-md p-1.5 text-neutral-900 hover:bg-light-200 dark:text-dark-900 dark:hover:bg-dark-200 dark:hover:text-dark-1000"
+          )}>
             {avatarUrl ? (
               <Image
                 src={avatarUrl}
                 className="rounded-full bg-gray-50"
-                width={24}
-                height={24}
+                width={collapsed ? 28 : 24}
+                height={collapsed ? 28 : 24}
                 alt=""
               />
             ) : (
-              <span className="inline-block h-6 w-6 overflow-hidden rounded-full bg-light-400 dark:bg-dark-400">
+              <span className={collapsed ? "inline-block h-7 w-7 overflow-hidden rounded-full bg-light-400 dark:bg-dark-400" : "inline-block h-6 w-6 overflow-hidden rounded-full bg-light-400 dark:bg-dark-400"}>
                 <svg
                   className="h-full w-full text-dark-700"
                   fill="currentColor"
@@ -64,7 +69,7 @@ export default function UserMenu({
                 </svg>
               </span>
             )}
-            <span className="mx-2 truncate text-sm">{email}</span>
+            {!collapsed && <span className="mx-2 truncate text-sm">{email}</span>}
           </Menu.Button>
         )}
       </div>
@@ -78,7 +83,10 @@ export default function UserMenu({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute bottom-[40px] left-0 z-10 mt-2 w-full origin-top-left rounded-md border border-light-600 bg-light-50 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:border-dark-600 dark:bg-dark-300">
+        <Menu.Items className={classNames(
+          "absolute bottom-[40px] left-0 z-10 mt-2 origin-top-left rounded-md border shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none",
+          collapsed ? "min-w-[140px] border-light-600 bg-light-50 dark:border-dark-600 dark:bg-dark-300" : "w-full border-light-600 bg-light-50 dark:border-dark-600 dark:bg-dark-300"
+        )}>
           <div className="flex flex-col text-neutral-900 dark:text-dark-1000">
             <div className="p-1">
               <div className="flex w-full items-center px-3 py-2 text-left text-xs">

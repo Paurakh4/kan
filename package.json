@@ -13,6 +13,8 @@
     "db:migrate": "cd packages/db && pnpm migrate",
     "db:push": "turbo -F @kan/db push",
     "db:studio": "turbo -F @kan/db studio",
+    "db:fix-placeholder-text": "pnpm dlx tsx scripts/fix-placeholder-text.ts",
+    "db:fix-placeholder-text:dry-run": "pnpm dlx tsx scripts/fix-placeholder-text.ts --dry-run",
     "dev": "turbo watch dev --continue",
     "dev:next": "turbo watch dev -F @kan/web...",
     "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",

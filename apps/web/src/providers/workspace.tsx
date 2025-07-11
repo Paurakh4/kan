@@ -91,16 +91,32 @@ export const WorkspaceProvider: React.FC<{ children: ReactNode }> = ({
         ({ workspace }) => workspace.publicId === storedWorkspaceId,
       );
 
-      if (!selectedWorkspace?.workspace) return;
+      if (selectedWorkspace?.workspace) {
+        setWorkspace({
+          publicId: selectedWorkspace.workspace.publicId,
+          name: selectedWorkspace.workspace.name,
+          slug: selectedWorkspace.workspace.slug,
+          plan: selectedWorkspace.workspace.plan,
+          description: selectedWorkspace.workspace.description,
+          role: selectedWorkspace.role,
+        });
+      } else {
+        // If stored workspace not found, fall back to first available workspace
+        const primaryWorkspace = data[0]?.workspace;
+        const primaryWorkspaceRole = data[0]?.role;
 
-      setWorkspace({
-        publicId: selectedWorkspace.workspace.publicId,
-        name: selectedWorkspace.workspace.name,
-        slug: selectedWorkspace.workspace.slug,
-        plan: selectedWorkspace.workspace.plan,
-        description: selectedWorkspace.workspace.description,
-        role: selectedWorkspace.role,
-      });
+        if (primaryWorkspace && primaryWorkspaceRole) {
+          localStorage.setItem("workspacePublicId", primaryWorkspace.publicId);
+          setWorkspace({
+            publicId: primaryWorkspace.publicId,
+            name: primaryWorkspace.name,
+            slug: primaryWorkspace.slug,
+            plan: primaryWorkspace.plan,
+            description: primaryWorkspace.description,
+            role: primaryWorkspaceRole,
+          });
+        }
+      }
     } else {
       const primaryWorkspace = data[0]?.workspace;
       const primaryWorkspaceRole = data[0]?.role;
@@ -115,6 +131,11 @@ export const WorkspaceProvider: React.FC<{ children: ReactNode }> = ({
         description: primaryWorkspace.description,
         role: primaryWorkspaceRole,
       });
+    }
+
+    // Mark as loaded when workspace data is processed
+    if (data?.length) {
+      setHasLoaded(true);
     }
   }, [data]);
 

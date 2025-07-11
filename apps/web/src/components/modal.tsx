@@ -2,6 +2,14 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 
 import { useModal } from "~/providers/modal";
+import React, { createContext, useContext } from "react";
+
+type ModalSizeType = "sm" | "md" | "lg";
+const ModalSizeContext = createContext<ModalSizeType | undefined>(undefined);
+
+export const ModalSizeProvider = ({ size, children }: { size: ModalSizeType, children: React.ReactNode }) => (
+  <ModalSizeContext.Provider value={size}>{children}</ModalSizeContext.Provider>
+);
 
 interface Props {
   children: React.ReactNode;
@@ -15,6 +23,8 @@ const Modal: React.FC<Props> = ({
   positionFromTop = "md",
 }) => {
   const { isOpen, closeModal } = useModal();
+  const contextSize = useContext(ModalSizeContext);
+  const effectiveSize = contextSize || modalSize;
 
   const modalSizeMap = {
     sm: "max-w-[400px]",
@@ -55,7 +65,7 @@ const Modal: React.FC<Props> = ({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel
-                className={`relative ${positionFromTopMap[positionFromTop]} w-full transform rounded-lg border border-light-600 bg-white/90 text-left shadow-3xl-light backdrop-blur-[6px] transition-all dark:border-dark-600 dark:bg-dark-100/90 dark:shadow-3xl-dark ${modalSizeMap[modalSize]}`}
+                className={`relative ${positionFromTopMap[positionFromTop]} w-full transform rounded-lg border border-light-600 bg-white/90 text-left shadow-3xl-light backdrop-blur-[6px] transition-all dark:border-dark-600 dark:bg-dark-100/90 dark:shadow-3xl-dark ${modalSizeMap[effectiveSize]}`}
               >
                 {children}
               </Dialog.Panel>

@@ -1,3 +1,4 @@
+import { aiRouter } from "./routers/ai";
 import { boardRouter } from "./routers/board";
 import { cardRouter } from "./routers/card";
 import { feedbackRouter } from "./routers/feedback";
@@ -11,6 +12,7 @@ import { workspaceRouter } from "./routers/workspace";
 import { createTRPCRouter } from "./trpc";
 
 export const appRouter = createTRPCRouter({
+  ai: aiRouter,
   board: boardRouter,
   card: cardRouter,
   feedback: feedbackRouter,
