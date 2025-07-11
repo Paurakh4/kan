@@ -16,57 +16,79 @@ if (typeof process !== 'undefined' && !process.env.NEXT_RUNTIME && !process.env.
 
 // AI Configuration Schema (GPT-4 WINNER PROMPT + COST-EFFECTIVE MODEL)
 const aiConfigSchema = z.object({
-  // Model Configuration (DeepSeek free tier with GPT-4 winner prompt)
+  // Model Configuration (Optimized for speed - can be overridden via env)
   modelId: z.string().default("deepseek/deepseek-chat-v3-0324:free"),
   apiKey: z.string().optional(),
   baseUrl: z.string().default("https://openrouter.ai/api/v1"),
 
-  // Model Parameters (Optimized for DeepSeek with GPT-4 winner prompt)
-  temperature: z.number().min(0).max(2).default(0.3),
-  maxTokens: z.number().min(1).max(8000).default(3000),
-  topP: z.number().min(0).max(1).default(1),
+  // Model Parameters (Optimized for Speed + Quality Balance)
+  temperature: z.number().min(0).max(2).default(0.2),
+  maxTokens: z.number().min(1).max(8000).default(1500),
+  topP: z.number().min(0).max(1).default(0.9),
   frequencyPenalty: z.number().min(-2).max(2).default(0),
   presencePenalty: z.number().min(-2).max(2).default(0),
   
-  // System Prompts (GPT 4.0 WINNER - 9.8/10 score from comprehensive testing)
+  // Optimized System Prompt (Speed + Quality Balance)
   systemPrompt: z.string().default(
-    "Role: You are an AI service designed to generate Kanban board plans. Action: Generate a complete Kanban board in JSON format. Context: The user will provide a high-level project idea along with a list of desired features. Using this input, the AI must generate a well-structured Kanban board that includes relevant lists, detailed cards, and appropriate labels. The output must be optimized to reduce setup time for the user and provide a practical, actionable starting point for the project. Expectation: The output must be in English. It must contain only valid JSON with no explanations, conversational text, or greetings. The response must not start with any non-JSON content or phrases. Ensure the JSON is fully valid and parseable, representing a Kanban board that includes lists, cards, and labels based on the provided project idea and features. Generate a JSON object with this EXACT structure (all text must be in English): { \"lists\": [ { \"title\": \"Backlog\", \"cards\": [ { \"title\": \"Setup project repository\", \"description\": \"Initialize git repository and basic project structure\", \"labels\": [\"setup\", \"backend\"] } ] }, { \"title\": \"To Do\", \"cards\": [] }, { \"title\": \"In Progress\", \"cards\": [] }, { \"title\": \"Done\", \"cards\": [] } ] }"
-  ),
-  
-  // Kanban Generation Prompts
-  kanbanPromptTemplate: z.string().default(`IMPORTANT: Respond ONLY with valid JSON. Do NOT include any text before or after the JSON. Do NOT use Chinese language.
+    `You are a project management AI. Generate actionable Kanban boards in JSON format.
 
-Project: {projectIdea}
-Features: {features}
+REQUIREMENTS:
+- Create specific, unique cards with **Markdown** descriptions
+- Make each task actionable with clear outcomes
+- Use professional, varied language
+- Tailor content to the project domain
 
-Generate a JSON object with this EXACT structure (all text must be in English):
+CARD DESCRIPTION GUIDELINES:
+- Use active voice with specific action verbs (implement, design, configure, test, deploy)
+- Include concrete deliverables and acceptance criteria where relevant
+- Vary sentence structure and vocabulary to avoid monotonous content
+- Add technical context appropriate to the project type
+- Specify tools, technologies, or methodologies when applicable
 
+MANDATORY FORMATTING REQUIREMENTS:
+- ALWAYS use **bold text** for key deliverables and important concepts
+- Start descriptions with a **bold action statement**
+- Include specific technical details: frameworks, databases, APIs, tools
+- Use bullet points (-) for multi-step processes or requirements
+- Mention specific technologies relevant to the project domain
+
+TASK COMPLEXITY MAPPING:
+- **Setup/Infrastructure**: Focus on environment, tooling, and foundational architecture with specific tech stack details
+- **Feature Development**: Break down into logical components with clear user value and implementation technologies
+- **Integration**: Emphasize data flow, API contracts, and system interactions with specific protocols
+- **Testing**: Include unit, integration, and user acceptance testing strategies with testing frameworks
+- **Documentation**: Specify audience, format, and maintenance requirements with documentation tools
+
+TECHNICAL DETAIL REQUIREMENTS:
+- Always mention relevant frameworks (React, Node.js, Django, etc.)
+- Specify database technologies (PostgreSQL, MongoDB, Redis, etc.)
+- Include API specifications (REST, GraphQL, WebSocket, etc.)
+- Reference deployment platforms (AWS, Docker, Kubernetes, etc.)
+- Mention development tools (Git, CI/CD, testing frameworks, etc.)
+
+LABEL STRATEGY:
+- Use semantic labels that reflect both technical domain and work type
+- Combine technical labels (frontend, backend, api, database) with functional ones (feature, testing, documentation)
+- Add domain-specific labels when appropriate (security, performance, ui/ux)
+
+OUTPUT FORMAT: Return ONLY valid JSON with no explanations, greetings, or additional text. The response must be immediately parseable and follow the EXACT structure below with a "lists" array containing exactly 4 list objects with titles: "Backlog", "To Do", "In Progress", "Done".
+
+MANDATORY JSON STRUCTURE - FOLLOW EXACTLY:
 {
   "lists": [
     {
       "title": "Backlog",
       "cards": [
         {
-          "title": "Setup project repository",
-          "description": "Initialize git repository and basic project structure",
-          "labels": ["setup", "backend"]
-        },
-        {
-          "title": "Design user interface",
-          "description": "Create wireframes and mockups for the main user interface",
-          "labels": ["design", "frontend"]
+          "title": "Establish development environment and CI/CD pipeline",
+          "description": "**Configure comprehensive development stack** using Node.js, TypeScript, and PostgreSQL. Set up Docker containers, GitHub Actions for CI/CD, and establish code quality tools including ESLint, Prettier, and Jest testing framework.",
+          "labels": ["setup", "backend", "tooling"]
         }
       ]
     },
     {
       "title": "To Do",
-      "cards": [
-        {
-          "title": "Implement authentication",
-          "description": "Set up user login and registration system",
-          "labels": ["backend", "security"]
-        }
-      ]
+      "cards": []
     },
     {
       "title": "In Progress",
@@ -79,24 +101,102 @@ Generate a JSON object with this EXACT structure (all text must be in English):
   ]
 }
 
-STRICT REQUIREMENTS:
-1. ALL text must be in English, never Chinese
-2. Create exactly 4 lists with titles: "Backlog", "To Do", "In Progress", "Done"
-3. Generate 4-8 cards total, distributed across Backlog (3-5 cards) and To Do (1-3 cards)
-4. Each card needs: title (English), description (English), labels array
-5. Use labels: "frontend", "backend", "api", "ui", "database", "testing", "documentation", "feature"
-6. Descriptions must be actionable and specific
-7. Return ONLY the JSON object, no other text`),
+CRITICAL: Your response must start with { and end with } and contain ONLY this JSON structure. Do not use any other format.`
+  ),
   
-  // Retry Configuration (Optimized for DeepSeek)
-  maxRetries: z.number().min(1).max(5).default(2),
-  retryDelay: z.number().min(100).max(5000).default(1000),
+  // Optimized Kanban Generation Template
+  kanbanPromptTemplate: z.string().default(`Create a Kanban board for: {projectIdea}
+Features: {features}
+
+REQUIREMENTS:
+- Create 4 lists: "Backlog", "To Do", "In Progress", "Done"
+- Generate 4-6 cards total in Backlog and To Do
+- Use **bold** text in descriptions for key actions
+- Include relevant labels: frontend, backend, api, database, feature, testing
+- Make each card specific and actionable
+
+Return ONLY JSON:
+{
+  "lists": [
+    {
+      "title": "Backlog",
+      "cards": [
+        {
+          "title": "Setup development environment",
+          "description": "**Configure** Node.js, database, and deployment pipeline",
+          "labels": ["setup", "backend"]
+        }
+      ]
+    },
+    {"title": "To Do", "cards": []},
+    {"title": "In Progress", "cards": []},
+    {"title": "Done", "cards": []}
+  ]
+}`),
+  
+  // Retry Configuration (Optimized for Speed)
+  maxRetries: z.number().min(1).max(5).default(1),
+  retryDelay: z.number().min(100).max(5000).default(500),
   
   // Fallback Configuration
   enableFallback: z.boolean().default(true),
   fallbackLabels: z.array(z.string()).default([
     "frontend", "backend", "feature", "api", "ui", "database", "testing", "documentation"
   ]),
+
+  // Task Complexity and Quality Guidelines
+  taskComplexityGuidelines: z.string().default(`
+TASK COMPLEXITY GUIDELINES:
+
+**EPIC LEVEL** (Large, multi-sprint initiatives):
+- Scope: Major feature areas or system components
+- Description: High-level business value and user impact
+- Technical Detail: Architecture decisions and integration points
+- Example: "Implement comprehensive user authentication system"
+
+**STORY LEVEL** (User-focused features, 1-2 sprints):
+- Scope: Specific user functionality with clear value
+- Description: User scenarios and acceptance criteria
+- Technical Detail: Component interactions and data flow
+- Example: "Enable users to reset passwords via email verification"
+
+**TASK LEVEL** (Implementation work, 1-5 days):
+- Scope: Specific technical implementation
+- Description: Concrete deliverables and technical approach
+- Technical Detail: Specific technologies, APIs, and methods
+- Example: "Configure JWT token validation middleware"
+
+**BUG/ISSUE LEVEL** (Problem resolution, hours to days):
+- Scope: Specific problem or improvement
+- Description: Current state, expected behavior, and solution approach
+- Technical Detail: Root cause analysis and fix strategy
+- Example: "Fix memory leak in data processing pipeline"
+
+QUALITY INDICATORS:
+- ✅ Specific action verbs and clear outcomes
+- ✅ Context-appropriate technical detail
+- ✅ Measurable success criteria
+- ✅ Relevant tools and technologies mentioned
+- ❌ Generic phrases like "work on" or "handle"
+- ❌ Vague descriptions without clear deliverables
+- ❌ Repetitive language across cards
+  `),
+
+  // Enhanced Label Categories
+  labelCategories: z.object({
+    technical: z.array(z.string()).default([
+      "frontend", "backend", "api", "database", "ui", "mobile", "web"
+    ]),
+    workType: z.array(z.string()).default([
+      "feature", "testing", "documentation", "setup", "integration", "refactor"
+    ]),
+    quality: z.array(z.string()).default([
+      "security", "performance", "accessibility", "monitoring", "optimization"
+    ]),
+    domain: z.array(z.string()).default([
+      "auth", "payment", "analytics", "notification", "search", "admin"
+    ])
+  }).default({}),
 });
 
 export type AIConfig = z.infer<typeof aiConfigSchema>;
@@ -129,6 +229,12 @@ export function loadAIConfig(): AIConfig {
     // Fallback Configuration
     enableFallback: process.env.AI_ENABLE_FALLBACK ? process.env.AI_ENABLE_FALLBACK.toLowerCase() === 'true' : undefined,
     fallbackLabels: process.env.AI_FALLBACK_LABELS ? process.env.AI_FALLBACK_LABELS.split(',').map(l => l.trim()) : undefined,
+
+    // Task Complexity Guidelines
+    taskComplexityGuidelines: process.env.AI_TASK_COMPLEXITY_GUIDELINES,
+
+    // Enhanced Label Categories
+    labelCategories: process.env.AI_LABEL_CATEGORIES ? JSON.parse(process.env.AI_LABEL_CATEGORIES) : undefined,
   };
 
   // Remove undefined values to let defaults take effect

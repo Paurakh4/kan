@@ -10,6 +10,7 @@ import * as workspaceRepo from "@kan/db/repository/workspace.repo";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { assertUserInWorkspace } from "../utils/auth";
+import { ensureHTMLFormat } from "../utils/markdown-to-html";
 
 export const cardRouter = createTRPCRouter({
   create: protectedProcedure
@@ -612,7 +613,11 @@ export const cardRouter = createTRPCRouter({
           code: "NOT_FOUND",
         });
 
-      return result;
+      // Ensure description is in HTML format for TipTap editor compatibility
+      return {
+        ...result,
+        description: ensureHTMLFormat(result.description),
+      };
     }),
   update: protectedProcedure
     .meta({

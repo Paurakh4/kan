@@ -15,6 +15,7 @@ import {
   validateAndCleanAIResponse,
   type AIResponse
 } from "../config/ai";
+import { safeMarkdownToHTML } from "../utils/markdown-to-html";
 
 // Temporary inline generateSlug function until import issue is resolved
 const generateSlug = (text: string): string => {
@@ -28,6 +29,40 @@ const generateSlug = (text: string): string => {
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { assertUserInWorkspace } from "../utils/auth";
+
+// Simple in-memory cache for AI responses (5 minute TTL)
+const responseCache = new Map<string, { response: AIResponse; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function getCacheKey(projectIdea: string, features: string[]): string {
+  return `${projectIdea.toLowerCase().trim()}-${features.sort().join(',')}`;
+}
+
+function getCachedResponse(projectIdea: string, features: string[]): AIResponse | null {
+  const key = getCacheKey(projectIdea, features);
+  const cached = responseCache.get(key);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    console.log(`[AI] Cache hit for project: ${projectIdea}`);
+    return cached.response;
+  }
+
+  // Clean up expired entries
+  if (cached) {
+    responseCache.delete(key);
+  }
+
+  return null;
+}
+
+function setCachedResponse(projectIdea: string, features: string[], response: AIResponse): void {
+  const key = getCacheKey(projectIdea, features);
+  responseCache.set(key, {
+    response,
+    timestamp: Date.now()
+  });
+  console.log(`[AI] Cached response for project: ${projectIdea}`);
+}
 
 // Input validation schema
 const generatePlanInputSchema = z.object({
@@ -77,7 +112,7 @@ const generateFallbackResponse = (projectIdea: string, features: string[]): AIRe
 
   const fallbackCards = features.slice(0, 6).map((feature, index) => ({
     title: `Implement ${feature}`,
-    description: `Work on implementing the ${feature} feature for the project`,
+    description: `<p><strong>Implement ${feature} functionality</strong> for the project. This task involves developing the core features and ensuring proper integration with the existing system.</p>`,
     labels: index % 2 === 0
       ? [config.fallbackLabels[0] || "frontend", "feature"]
       : [config.fallbackLabels[1] || "backend", "feature"],
@@ -207,11 +242,24 @@ export const aiRouter = createTRPCRouter({
       };
 
       try {
-        const aiResponse = await generateWithRetry();
+        let aiResponse: AIResponse;
 
-        // Log the validated response
+        // Check cache first
+        const cachedResponse = getCachedResponse(input.projectIdea, input.features);
+        if (cachedResponse) {
+          console.log(`[AI] Using cached response - skipping AI generation`);
+          aiResponse = cachedResponse;
+        } else {
+          // Generate new response
+          aiResponse = await generateWithRetry();
+
+          // Cache the successful response
+          setCachedResponse(input.projectIdea, input.features, aiResponse);
+        }
+
+        // Log the response (cached or generated)
         const totalCards = aiResponse.lists.reduce((sum, list) => sum + list.cards.length, 0);
-        console.log(`[AI] Generated ${aiResponse.lists.length} lists with ${totalCards} total cards`);
+        console.log(`[AI] Using ${aiResponse.lists.length} lists with ${totalCards} total cards`);
 
         // Generate unique slug
         let slug = generateSlug(input.boardName);
@@ -286,7 +334,7 @@ export const aiRouter = createTRPCRouter({
           const cardInputs = aiList.cards.map((card, cardIndex) => ({
             publicId: generateUID(),
             title: card.title,
-            description: card.description || "",
+            description: safeMarkdownToHTML(card.description || ""),
             listId: targetList.id,
             createdBy: userId,
             index: cardIndex,

@@ -12,6 +12,7 @@ import { generateSlug, generateUID } from "@kan/shared/utils";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { assertUserInWorkspace } from "../utils/auth";
+import { ensureHTMLFormat } from "../utils/markdown-to-html";
 
 export const boardRouter = createTRPCRouter({
   all: protectedProcedure
@@ -105,7 +106,19 @@ export const boardRouter = createTRPCRouter({
         },
       );
 
-      return result;
+      if (!result) return result;
+
+      // Ensure card descriptions are in HTML format for TipTap editor compatibility
+      return {
+        ...result,
+        lists: result.lists.map(list => ({
+          ...list,
+          cards: list.cards.map(card => ({
+            ...card,
+            description: ensureHTMLFormat(card.description),
+          })),
+        })),
+      };
     }),
   bySlug: publicProcedure
     .meta({
@@ -136,7 +149,19 @@ export const boardRouter = createTRPCRouter({
         labels: input.labels ?? [],
       });
 
-      return result;
+      if (!result) return result;
+
+      // Ensure card descriptions are in HTML format for TipTap editor compatibility
+      return {
+        ...result,
+        lists: result.lists.map(list => ({
+          ...list,
+          cards: list.cards.map(card => ({
+            ...card,
+            description: ensureHTMLFormat(card.description),
+          })),
+        })),
+      };
     }),
   create: protectedProcedure
     .meta({

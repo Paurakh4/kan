@@ -164,7 +164,7 @@ export default function GeneratePlanModal() {
           <textarea
             {...register("projectIdea")}
             placeholder={t`Project details and main goals`}
-            className="w-full min-h-[60px] px-2 py-1 border border-light-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:border-dark-400 dark:bg-dark-200 dark:text-dark-1000 placeholder:text-xs"
+            className="block w-full rounded-md border-0 bg-dark-300 bg-white/5 py-1.5 text-sm shadow-sm ring-1 ring-inset ring-light-600 placeholder:text-dark-800 focus:ring-2 focus:ring-inset focus:ring-light-700 dark:text-dark-1000 dark:ring-dark-700 dark:focus:ring-dark-700 sm:leading-6 min-h-[60px] px-3 placeholder:text-xs"
             rows={2}
           />
           {errors.projectIdea && (
