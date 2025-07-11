@@ -10,7 +10,7 @@ import * as labelRepo from "@kan/db/repository/label.repo";
 import * as listRepo from "@kan/db/repository/list.repo";
 import * as workspaceRepo from "@kan/db/repository/workspace.repo";
 import { colours } from "@kan/shared/constants";
-import { generateUID } from "@kan/shared/utils";
+import { generateUID, generateSlug } from "@kan/shared/utils";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { assertUserInWorkspace } from "../utils/auth";
@@ -200,10 +200,22 @@ export const importRouter = createTRPCRouter({
 
           const boardPublicId = generateUID();
 
+          // Generate a proper slug from the board name
+          let boardSlug = generateSlug(formattedData.name);
+
+          // Check if the slug is unique within the workspace, if not, append a UID
+          const isSlugUnique = await boardRepo.isSlugUnique(ctx.db, {
+            slug: boardSlug,
+            workspaceId: workspace.id,
+          });
+          if (!isSlugUnique) {
+            boardSlug = `${boardSlug}-${generateUID()}`;
+          }
+
           const newBoard = await boardRepo.create(ctx.db, {
             publicId: boardPublicId,
             name: formattedData.name,
-            slug: boardPublicId,
+            slug: boardSlug,
             createdBy: userId,
             importId: newImportId,
             workspaceId: workspace.id,

@@ -84,7 +84,7 @@ export function NewCardForm({
         const updatedLists = oldBoard.lists.map((list) => {
           if (list.publicId === listPublicId) {
             const newCard = {
-              publicId: `PLACEHOLDER_${generateUID()}`,
+              publicId: generateUID(),
               title: args.title,
               listId: 2,
               description: "",

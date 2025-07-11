@@ -1,7 +1,10 @@
 import { t } from "@lingui/core/macro";
 import { HiArrowDownTray, HiOutlinePlusSmall } from "react-icons/hi2";
 
+import { DEFAULT_TEXT, getSafeDisplayText } from "@kan/shared/constants";
+
 import Button from "~/components/Button";
+import GeneratePlanModal from "~/components/GeneratePlanModal";
 import Modal from "~/components/modal";
 import { NewWorkspaceForm } from "~/components/NewWorkspaceForm";
 import { PageHead } from "~/components/PageHead";
@@ -19,7 +22,7 @@ export default function BoardsPage() {
 
   return (
     <>
-      <PageHead title={t`Boards | ${workspace.name ?? "Workspace"}`} />
+      <PageHead title={t`Boards | ${getSafeDisplayText(workspace.name, DEFAULT_TEXT.WORKSPACE.DEFAULT_NAME)}`} />
       <div className="m-auto h-full max-w-[1600px] px-5 py-6 md:px-8 md:py-8">
         <div className="mb-8 flex w-full items-center justify-between">
           <h1 className="font-bold tracking-tight text-neutral-900 dark:text-dark-1000 sm:text-[1.2rem]">
@@ -49,10 +52,11 @@ export default function BoardsPage() {
           </div>
         </div>
 
-        <Modal>
+        <Modal modalSize={modalContentType === "GENERATE_PLAN" ? "md" : "sm"}>
           {modalContentType === "NEW_BOARD" && <NewBoardForm />}
           {modalContentType === "IMPORT_BOARDS" && <ImportBoardsForm />}
           {modalContentType === "NEW_WORKSPACE" && <NewWorkspaceForm />}
+          {modalContentType === "GENERATE_PLAN" && <GeneratePlanModal />}
         </Modal>
 
         <div className="flex h-full flex-row">

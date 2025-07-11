@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { HiOutlinePlusSmall, HiOutlineSquare3Stack3D } from "react-icons/hi2";
 
 import type { UpdateBoardInput } from "@kan/api/types";
+import { DEFAULT_TEXT, getSafeDisplayText } from "@kan/shared/constants";
 
 import Button from "~/components/Button";
 import { DeleteLabelConfirmation } from "~/components/DeleteLabelConfirmation";
@@ -35,6 +36,8 @@ import { NewListForm } from "./components/NewListForm";
 import UpdateBoardSlugButton from "./components/UpdateBoardSlugButton";
 import { UpdateBoardSlugForm } from "./components/UpdateBoardSlugForm";
 import VisibilityButton from "./components/VisibilityButton";
+import GeneratePlanModal from "~/components/GeneratePlanModal";
+import { ModalSizeProvider } from "~/components/modal";
 
 type PublicListId = string;
 
@@ -237,7 +240,7 @@ export default function BoardPage() {
   return (
     <>
       <PageHead
-        title={`${boardData?.name ?? t`Board`} | ${workspace.name ?? t`Workspace`}`}
+        title={`${getSafeDisplayText(boardData?.name, DEFAULT_TEXT.BOARD.DEFAULT_NAME)} | ${getSafeDisplayText(workspace.name, DEFAULT_TEXT.WORKSPACE.DEFAULT_NAME)}`}
       />
       <div className="relative flex h-full flex-col">
         <PatternedBackground />
@@ -252,13 +255,15 @@ export default function BoardPage() {
               onSubmit={handleSubmit(onSubmit)}
               className="order-2 focus-visible:outline-none md:order-1"
             >
-              <input
-                id="name"
-                type="text"
-                {...register("name")}
-                onBlur={handleSubmit(onSubmit)}
-                className="block border-0 bg-transparent p-0 py-0 font-bold leading-[2.3rem] tracking-tight text-neutral-900 focus:ring-0 focus-visible:outline-none dark:text-dark-1000 sm:text-[1.2rem]"
-              />
+              <div className="flex w-full max-w-[90vw] md:max-w-[600px] lg:max-w-[800px]">
+                <input
+                  id="name"
+                  type="text"
+                  {...register("name")}
+                  onBlur={handleSubmit(onSubmit)}
+                  className="block w-full border-0 bg-transparent p-0 py-0 font-bold leading-[2.3rem] tracking-tight text-neutral-900 focus:ring-0 focus-visible:outline-none dark:text-dark-1000 sm:text-[1.2rem] truncate"
+                />
+              </div>
             </form>
           )}
           {!boardData && !isLoading && (
@@ -398,6 +403,7 @@ export default function BoardPage() {
                                         >
                                           <Card
                                             title={card.title}
+                                            description={card.description ?? undefined}
                                             labels={card.labels}
                                             members={card.members}
                                           />
@@ -421,7 +427,7 @@ export default function BoardPage() {
             </>
           ) : null}
         </div>
-        <Modal modalSize={modalContentType === "NEW_CARD" ? "md" : "sm"}>
+        <Modal modalSize={modalContentType === "GENERATE_PLAN" ? "md" : (modalContentType === "NEW_CARD" ? "md" : "sm") }>
           {modalContentType === "DELETE_BOARD" && (
             <DeleteBoardConfirmation boardPublicId={boardId ?? ""} />
           )}
@@ -462,13 +468,16 @@ export default function BoardPage() {
             />
           )}
           {modalContentType === "UPDATE_BOARD_SLUG" && (
-            <UpdateBoardSlugForm
-              boardPublicId={boardId ?? ""}
-              workspaceSlug={workspace.slug ?? ""}
-              boardSlug={boardData?.slug ?? ""}
-              queryParams={queryParams}
-            />
+            <ModalSizeProvider size="lg">
+              <UpdateBoardSlugForm
+                boardPublicId={boardId ?? ""}
+                workspaceSlug={workspace.slug ?? ""}
+                boardSlug={boardData?.slug ?? ""}
+                queryParams={queryParams}
+              />
+            </ModalSizeProvider>
           )}
+          {modalContentType === "GENERATE_PLAN" && <GeneratePlanModal />}
         </Modal>
       </div>
     </>

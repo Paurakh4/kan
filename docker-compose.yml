@@ -1,22 +1,21 @@
 services:
   web:
-    image: ghcr.io/kanbn/kan:latest
-    container_name: ${CONTAINER_NAME:-kan-web}
-    ports:
-      - "${WEB_PORT:-3000}:3000"
-    networks:
-      - kan-network
-      - dokploy-network
     build:
       context: .
-      dockerfile: ./apps/web/Dockerfile.new
+      dockerfile: ./apps/web/Dockerfile
+    container_name: ${CONTAINER_NAME:-kan-web}
+    ports:
+      - "3003:3000"
+    networks:
+      - kan-network
     env_file:
       - .env
     environment:
       # Required environment variables
-      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3003
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
-      - POSTGRES_URL=${POSTGRES_URL}
+      - POSTGRES_URL=postgresql://kan:${POSTGRES_PASSWORD}@postgres:5432/kan_db
+      - NEXT_PUBLIC_USE_STANDALONE_OUTPUT=true
 
       # SMTP (optional)
       - SMTP_HOST=${SMTP_HOST}
@@ -83,28 +82,34 @@ services:
       - APPLE_CLIENT_SECRET=${APPLE_CLIENT_SECRET}
       - APPLE_APP_BUNDLE_IDENTIFIER=${APPLE_APP_BUNDLE_IDENTIFIER}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
 
   postgres:
     image: postgres:15
     container_name: kan-db
     environment:
-      - POSTGRES_DB=kan_db
-      - POSTGRES_USER=kan
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      POSTGRES_DB: kan_db
+      POSTGRES_USER: kan
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: ${POSTGRES_HOST_AUTH_METHOD:-trust}
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - kan_postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
       - kan-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kan -d kan_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   kan-network:
-  dokploy-network:
-    external: true
+    # keep your kan-network config here
 
 volumes:
   kan_postgres_data:

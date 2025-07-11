@@ -57,6 +57,10 @@ msgstr "Aktivität"
 msgid "Activity logs"
 msgstr "Aktivitätsprotokolle"
 
+#: src/components/GeneratePlanModal.tsx:172
+msgid "Add"
+msgstr ""
+
 #: src/views/board/components/List.tsx:110
 msgid "Add a card"
 msgstr "Karte hinzufügen"
@@ -178,9 +182,13 @@ msgstr "Abrechnungsportal"
 msgid "Blog Post"
 msgstr "Blogbeitrag"
 
-#: src/views/board/index.tsx:240
+#: src/views/board/index.tsx:242
 msgid "Board"
 msgstr "Board"
+
+#: src/components/GeneratePlanModal.tsx:129
+msgid "Board Name"
+msgstr ""
 
 #: src/views/boards/components/NewBoardForm.tsx:21
 msgid "Board name cannot exceed 100 characters"
@@ -190,7 +198,7 @@ msgstr "Der Name des Boards darf 100 Zeichen nicht überschreiten"
 msgid "Board name is required"
 msgstr "Boardname ist erforderlich"
 
-#: src/views/board/index.tsx:266
+#: src/views/board/index.tsx:270
 msgid "Board not found"
 msgstr "Board nicht gefunden"
 
@@ -218,13 +226,13 @@ msgstr "Board-Sichtbarkeit"
 msgid "Board visibility updated"
 msgstr "Board-Sichtbarkeit aktualisiert"
 
-#: src/views/boards/index.tsx:26
-#: src/components/SideNavigation.tsx:39
+#: src/views/boards/index.tsx:27
+#: src/components/SideNavigation.tsx:57
 msgid "Boards"
 msgstr "Boards"
 
 #. placeholder {0}: workspace.name ?? "Workspace"
-#: src/views/boards/index.tsx:22
+#: src/views/boards/index.tsx:23
 msgid "Boards | {0}"
 msgstr "Boards | {0}"
 
@@ -247,6 +255,7 @@ msgstr "Fehlerbericht"
 #: src/views/card/components/DeleteCommentConfirmation.tsx:76
 #: src/views/card/components/DeleteCardConfirmation.tsx:86
 #: src/views/card/components/Comment.tsx:156
+#: src/components/GeneratePlanModal.tsx:213
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -381,7 +390,7 @@ msgstr "Neuen Schlüssel erstellen"
 msgid "Create new label"
 msgstr "Neues Label erstellen"
 
-#: src/views/board/index.tsx:334
+#: src/views/board/index.tsx:338
 msgid "Create new list"
 msgstr "Neue Liste erstellen"
 
@@ -410,7 +419,7 @@ msgstr "Benutzerdefinierte URLs sind eine Premium-Funktion. Du wirst zur Aktuali
 msgid "Customer Support"
 msgstr "Kundensupport"
 
-#: src/components/UserMenu.tsx:112
+#: src/components/UserMenu.tsx:120
 msgid "Dark"
 msgstr "Dunkel"
 
@@ -447,6 +456,10 @@ msgstr "Liste löschen"
 #: src/views/settings/components/DeleteWorkspaceConfirmation.tsx:106
 msgid "Delete workspace"
 msgstr "Workspace löschen"
+
+#: src/components/GeneratePlanModal.tsx:121
+msgid "Describe your project and features, and AI will create a structured Kanban board for you."
+msgstr ""
 
 #: src/views/boards/components/TemplateBoards.tsx:32
 msgid "Design"
@@ -504,6 +517,14 @@ msgstr "Du hast noch kein Konto? <0><1>Registrieren</1></0>"
 msgid "Done"
 msgstr "Erledigt"
 
+#: src/components/GeneratePlanModal.tsx:133
+msgid "e.g., Mobile App Development"
+msgstr ""
+
+#: src/components/GeneratePlanModal.tsx:181
+msgid "e.g., User authentication, Push notifications"
+msgstr ""
+
 #: src/views/board/components/UpdateBoardSlugForm.tsx:115
 #: src/views/board/components/BoardDropdown.tsx:15
 msgid "Edit board URL"
@@ -517,7 +538,7 @@ msgstr "Kommentar bearbeiten"
 msgid "Edit label"
 msgstr "Label bearbeiten"
 
-#: src/views/board/components/UpdateBoardSlugForm.tsx:161
+#: src/views/board/components/UpdateBoardSlugForm.tsx:162
 msgid "Edit workspace URL"
 msgstr "Workspace-URL bearbeiten"
 
@@ -598,6 +619,10 @@ msgstr "Alles was du brauchst, für immer kostenlos. Unbegrenzte Boards, unbegre
 msgid "Execution"
 msgstr "Ausführung"
 
+#: src/components/GeneratePlanModal.tsx:60
+msgid "Failed to Generate Plan"
+msgstr ""
+
 #. placeholder {0}: provider.at(0)?.toUpperCase() + provider.slice(1)
 #: src/components/AuthForm.tsx:241
 msgid "Failed to login with {0}. Please try again."
@@ -619,6 +644,7 @@ msgstr "Feature-Anfrage"
 #: src/views/home/components/Header.tsx:14
 #: src/views/home/components/Footer.tsx:49
 #: src/views/home/components/Features.tsx:125
+#: src/components/GeneratePlanModal.tsx:161
 msgid "Features"
 msgstr "Features"
 
@@ -643,6 +669,7 @@ msgid "For long-term sustainability, we recognise all good open source projects 
 msgstr "Für langfristige Nachhaltigkeit erkennen wir an, dass alle guten Open-Source-Projekte eine Einnahmequelle benötigen. Unsere stammt aus dem kostenpflichtigen Cloud-Angebot für Workspaces mit mehreren Benutzern (kostenlos während der Beta-Phase) und für benutzerdefinierte Workspace-Slugs. Es besteht keine Verpflichtung, dieses Angebot zu nutzen, und Sie können die Software kostenlos auf Ihrer eigenen Infrastruktur selbst hosten."
 
 #: src/views/home/components/Pricing.tsx:32
+#: src/views/home/components/Pricing.tsx:32
 msgid "Free"
 msgstr "Kostenlos"
 
@@ -657,6 +684,20 @@ msgstr "Vollzeit"
 #: src/views/boards/components/TemplateBoards.tsx:83
 msgid "Fun"
 msgstr "Spaß"
+
+#: src/components/GeneratePlanModal.tsx:117
+msgid "Generate AI-Powered Kanban Plan"
+msgstr ""
+
+#: src/components/SideNavigation.tsx:97
+#: src/components/SideNavigation.tsx:104
+#: src/components/GeneratePlanModal.tsx:221
+msgid "Generate Plan"
+msgstr ""
+
+#: src/components/GeneratePlanModal.tsx:221
+msgid "Generating..."
+msgstr ""
 
 #: src/views/home/components/Header.tsx:102
 #: src/views/home/components/Header.tsx:141
@@ -674,7 +715,7 @@ msgstr "Loslegen"
 msgid "Get started by creating a new board"
 msgstr "Beginne, indem du ein neues Board erstellst"
 
-#: src/views/board/index.tsx:326
+#: src/views/board/index.tsx:330
 msgid "Get started by creating a new list"
 msgstr "Beginne mit dem Erstellen einer neuen Liste"
 
@@ -751,7 +792,7 @@ msgstr "Ideen"
 msgid "Ideas to improve this page..."
 msgstr "Ideen zur Verbesserung dieser Seite..."
 
-#: src/views/boards/index.tsx:37
+#: src/views/boards/index.tsx:38
 msgid "Import"
 msgstr "Importieren"
 
@@ -796,6 +837,10 @@ msgstr "Integrationen"
 #: src/views/boards/components/TemplateBoards.tsx:64
 msgid "Interviewing"
 msgstr "Vorstellungsgespräch"
+
+#: src/components/GeneratePlanModal.tsx:96
+msgid "Invalid Input"
+msgstr ""
 
 #: src/views/members/index.tsx:168
 msgid "Invite"
@@ -849,7 +894,7 @@ msgstr "Rechtliches"
 msgid "License"
 msgstr "Lizenz"
 
-#: src/components/UserMenu.tsx:126
+#: src/components/UserMenu.tsx:134
 msgid "Light"
 msgstr "Hell"
 
@@ -869,7 +914,7 @@ msgstr "Listenname"
 msgid "Login | kan.bn"
 msgstr "Login | kan.bn"
 
-#: src/components/UserMenu.tsx:136
+#: src/components/UserMenu.tsx:144
 msgid "Logout"
 msgstr "Abmelden"
 
@@ -893,7 +938,7 @@ msgstr "Mittlere Priorität"
 #: src/views/card/index.tsx:120
 #: src/views/board/components/NewCardForm.tsx:290
 #: src/views/board/components/Filters.tsx:93
-#: src/components/SideNavigation.tsx:44
+#: src/components/SideNavigation.tsx:62
 msgid "Members"
 msgstr "Mitglieder"
 
@@ -923,7 +968,7 @@ msgstr "Name"
 msgid "Need help?"
 msgstr "Brauchst du Hilfe?"
 
-#: src/views/boards/index.tsx:47
+#: src/views/boards/index.tsx:48
 msgid "New"
 msgstr "Neu"
 
@@ -943,7 +988,7 @@ msgstr "Neuer Import"
 msgid "New label"
 msgstr "Neues Label"
 
-#: src/views/board/index.tsx:303
+#: src/views/board/index.tsx:307
 #: src/views/board/components/NewListForm.tsx:112
 msgid "New list"
 msgstr "Neue Liste"
@@ -976,7 +1021,7 @@ msgstr "Keine Boards gefunden"
 msgid "No credit card required"
 msgstr "Keine Kreditkarte erforderlich"
 
-#: src/views/board/index.tsx:323
+#: src/views/board/index.tsx:327
 msgid "No lists"
 msgstr "Keine Listen"
 
@@ -1029,9 +1074,17 @@ msgstr "pro Benutzer/Monat"
 msgid "Personal Project"
 msgstr "Persönliches Projekt"
 
+#: src/components/GeneratePlanModal.tsx:51
+msgid "Plan Generated Successfully!"
+msgstr ""
+
 #: src/views/boards/components/TemplateBoards.tsx:77
 msgid "Planning"
 msgstr "Planung"
+
+#: src/components/GeneratePlanModal.tsx:97
+msgid "Please add at least one feature."
+msgstr ""
 
 #: src/components/AuthForm.tsx:305
 msgid "Please enter a valid email address"
@@ -1067,13 +1120,14 @@ msgstr "Bitte wähle eine Datei zum Hochladen aus."
 #: src/views/card/components/DeleteCardConfirmation.tsx:52
 #: src/views/card/components/Comment.tsx:62
 #: src/views/boards/components/ImportBoardsForm.tsx:205
-#: src/views/board/index.tsx:134
-#: src/views/board/index.tsx:190
+#: src/views/board/index.tsx:136
+#: src/views/board/index.tsx:192
 #: src/views/board/components/VisibilityButton.tsx:53
 #: src/views/board/components/UpdateBoardSlugForm.tsx:72
 #: src/views/board/components/NewListForm.tsx:78
 #: src/views/board/components/NewCardForm.tsx:128
 #: src/components/NewWorkspaceForm.tsx:41
+#: src/components/GeneratePlanModal.tsx:61
 #: src/components/FeedbackButton.tsx:46
 msgid "Please try again later, or contact customer support."
 msgstr "Bitte versuche es später noch einmal oder kontaktiere den Kundensupport."
@@ -1103,6 +1157,14 @@ msgstr "Profilbild aktualisiert"
 #: src/views/settings/index.tsx:143
 msgid "Profile picture"
 msgstr "Profilbild"
+
+#: src/components/GeneratePlanModal.tsx:146
+msgid "Project details and main goals"
+msgstr ""
+
+#: src/components/GeneratePlanModal.tsx:142
+msgid "Project Idea"
+msgstr ""
 
 #: src/views/board/components/VisibilityButton.tsx:68
 msgid "Public"
@@ -1226,7 +1288,7 @@ msgid "Senior"
 msgstr "Senior"
 
 #: src/views/settings/index.tsx:137
-#: src/components/SideNavigation.tsx:49
+#: src/components/SideNavigation.tsx:67
 msgid "Settings"
 msgstr "Einstellungen"
 
@@ -1286,7 +1348,7 @@ msgstr "Erfolg"
 msgid "Support the development of the project"
 msgstr "Unterstütze die Entwicklung des Projekts"
 
-#: src/components/UserMenu.tsx:98
+#: src/components/UserMenu.tsx:106
 msgid "System"
 msgstr "System"
 
@@ -1319,7 +1381,7 @@ msgstr "Die open source <0/> alternative zu Trello"
 msgid "The visibility of your board has been set to {0}."
 msgstr "Die Sichtbarkeit deines Boards wurde auf {0} gesetzt."
 
-#: src/components/UserMenu.tsx:85
+#: src/components/UserMenu.tsx:93
 msgid "Theme"
 msgstr "Design"
 
@@ -1414,7 +1476,7 @@ msgid "Unable to update board visibility"
 msgstr "Board-Sichtbarkeit konnte nicht aktualisiert werden"
 
 #: src/views/card/index.tsx:157
-#: src/views/board/index.tsx:189
+#: src/views/board/index.tsx:191
 msgid "Unable to update card"
 msgstr "Karte konnte nicht aktualisiert werden"
 
@@ -1427,7 +1489,7 @@ msgid "Unable to update labels"
 msgstr "Labels konnten nicht aktualisiert werden"
 
 #: src/views/card/components/ListSelector.tsx:52
-#: src/views/board/index.tsx:133
+#: src/views/board/index.tsx:135
 msgid "Unable to update list"
 msgstr "Liste konnte nicht aktualisiert werden"
 
@@ -1471,7 +1533,7 @@ msgstr "Unbegrenzte listen"
 #: src/views/settings/components/UpdateWorkspaceNameForm.tsx:82
 #: src/views/settings/components/UpdateWorkspaceDescriptionForm.tsx:90
 #: src/views/settings/components/UpdateDisplayNameForm.tsx:79
-#: src/views/board/components/UpdateBoardSlugForm.tsx:173
+#: src/views/board/components/UpdateBoardSlugForm.tsx:174
 msgid "Update"
 msgstr "Aktualisieren"
 
@@ -1572,7 +1634,7 @@ msgstr "Als Trello 2011 auf den markt kam, beeindruckte es alle mit seiner sorgf
 msgid "Why make an open source Trello?"
 msgstr "Warum ein open source Trello entwickeln?"
 
-#: src/views/board/index.tsx:240
+#: src/views/board/index.tsx:242
 msgid "Workspace"
 msgstr "Arbeitsbereich"
 
@@ -1661,6 +1723,10 @@ msgstr "Sie haben sich erfolgreich registriert."
 #: src/views/settings/components/DeleteAccountConfirmation.tsx:28
 msgid "Your account has been deleted."
 msgstr "Dein Konto wurde gelöscht."
+
+#: src/components/GeneratePlanModal.tsx:52
+msgid "Your AI-powered Kanban board has been created."
+msgstr ""
 
 #: src/views/boards/components/ImportBoardsForm.tsx:192
 msgid "Your boards have been imported."

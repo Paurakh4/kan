@@ -5,7 +5,7 @@ ARG PROJECT=@kan/web
 # 1. Alpine image
 FROM node:${NODE_VERSION}-alpine AS alpine
 RUN apk update
-RUN apk add --no-cache libc6-compat python3 make g++
+RUN apk add --no-cache libc6-compat python3 make g++ netcat-openbsd
 
 # Setup pnpm and turbo on the alpine base
 FROM alpine AS base
@@ -53,13 +53,15 @@ RUN --mount=type=cache,id=pnpm,target=~/.pnpm-store pnpm install --frozen-lockfi
 # Copy source code of isolated subworkspace
 COPY --from=pruner /app/out/full/ .
 
+# Compile i18n messages before building
+RUN pnpm --filter=@kan/web lingui:compile
 
 RUN pnpm build --filter=${PROJECT}
 
-# # Copy static files to standalone directory
-# RUN mkdir -p apps/web/.next/standalone/.next && \
-# mv apps/web/public apps/web/.next/standalone/ && \
-# mv apps/web/.next/static apps/web/.next/standalone/.next/
+# Copy static files to standalone directory
+RUN mkdir -p apps/web/.next/standalone/.next && \
+    cp -r apps/web/public apps/web/.next/standalone/ && \
+    cp -r apps/web/.next/static apps/web/.next/standalone/.next/
 
 # 4. Final image - runner stage to run the application
 FROM base AS runner
@@ -74,12 +76,19 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+# Copy the full application for now (simpler approach)
 COPY --chown=nextjs:nodejs --from=builder /app/ ./
+
 WORKDIR /app/apps/${APP_DIRNAME}
 
 ARG PORT=3000
 ENV PORT=${PORT}
 EXPOSE ${PORT}
 
-CMD ["sh", "-c", "cd /app && pnpm db:migrate && cd /app/apps/web && pnpm start"]
+# Create a startup script that handles migrations and starts the app
+USER root
+RUN printf '#!/bin/sh\nset -e\necho "Waiting for database..."\nwhile ! nc -z postgres 5432; do sleep 1; done\necho "Database is ready!"\necho "Running database migrations..."\ncd /app && pnpm db:migrate || echo "Migration failed, continuing..."\necho "Starting application..."\ncd /app/apps/web && pnpm start\n' > /app/start.sh && chmod +x /app/start.sh
+USER nextjs
+
+CMD ["/app/start.sh"]
 

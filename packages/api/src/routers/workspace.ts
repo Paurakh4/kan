@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import * as workspaceRepo from "@kan/db/repository/workspace.repo";
 import * as workspaceSlugRepo from "@kan/db/repository/workspaceSlug.repo";
-import { generateUID } from "@kan/shared/utils";
+import { generateUID, generateSlug } from "@kan/shared/utils";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { assertUserInWorkspace } from "../utils/auth";
@@ -155,10 +155,19 @@ export const workspaceRouter = createTRPCRouter({
 
       const workspacePublicId = generateUID();
 
+      // Generate a proper slug from the workspace name
+      let workspaceSlug = generateSlug(input.name);
+
+      // Check if the slug is available, if not, append a UID to make it unique
+      const isSlugAvailable = await workspaceRepo.isWorkspaceSlugAvailable(ctx.db, workspaceSlug);
+      if (!isSlugAvailable) {
+        workspaceSlug = `${workspaceSlug}-${generateUID()}`;
+      }
+
       const result = await workspaceRepo.create(ctx.db, {
         publicId: workspacePublicId,
         name: input.name,
-        slug: workspacePublicId,
+        slug: workspaceSlug,
         createdBy: userId,
         createdByEmail: userEmail,
       });

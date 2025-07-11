@@ -149,6 +149,7 @@ export function UpdateBoardSlugForm({
               <HiCheck className="h-4 w-4 dark:text-dark-1000" />
             )
           }
+          className="min-w-0 w-full md:w-[320px] lg:w-[420px] pr-10"
         />
       </div>
       <div className="mt-12 flex items-center justify-end border-t border-light-600 px-5 pb-5 pt-5 dark:border-dark-600">

@@ -35,7 +35,7 @@ const UpdateBoardSlugButton = ({
         <div className="mx-1.5 h-4 w-px rotate-[20deg] bg-gray-300 dark:bg-dark-600"></div>
         <span>{workspaceSlug}</span>
         <div className="mx-1.5 h-4 w-px rotate-[20deg] bg-gray-300 dark:bg-dark-600"></div>
-        <span>{boardSlug}</span>
+        <span>{boardSlug.length > 10 ? `${boardSlug.slice(0, 10)}...` : boardSlug}</span>
       </div>
       <Link
         href={`${env("NEXT_PUBLIC_BASE_URL")}/${workspaceSlug}/${boardSlug}`}

@@ -3,6 +3,8 @@ import { t } from "@lingui/core/macro";
 import { Fragment } from "react";
 import { HiCheck } from "react-icons/hi2";
 
+import { DEFAULT_TEXT, getSafeDisplayText } from "@kan/shared/constants";
+
 import { useModal } from "~/providers/modal";
 import { useWorkspace } from "~/providers/workspace";
 
@@ -23,11 +25,11 @@ export default function WorkspaceMenu() {
           <Menu.Button className="mb-1 flex w-full items-center rounded-[5px] p-1.5 hover:bg-light-200 dark:hover:bg-dark-200">
             <span className="inline-flex h-6 w-6 items-center justify-center rounded-[5px] bg-indigo-700">
               <span className="text-xs font-bold leading-none text-white">
-                {workspace.name.charAt(0).toUpperCase()}
+                {getSafeDisplayText(workspace.name, DEFAULT_TEXT.WORKSPACE.DEFAULT_NAME).charAt(0).toUpperCase()}
               </span>
             </span>
             <span className="ml-2 text-sm font-bold text-neutral-900 dark:text-dark-1000">
-              {workspace.name}
+              {getSafeDisplayText(workspace.name, DEFAULT_TEXT.WORKSPACE.DEFAULT_NAME)}
             </span>
             {workspace.plan === "pro" && (
               <span className="ml-2 inline-flex items-center rounded-md bg-indigo-100 px-2 py-1 text-[10px] font-medium text-indigo-700">
@@ -59,11 +61,11 @@ export default function WorkspaceMenu() {
                     <div>
                       <span className="inline-flex h-5 w-5 items-center justify-center rounded-[5px] bg-indigo-700">
                         <span className="text-xs font-medium leading-none text-white">
-                          {availableWorkspace.name.charAt(0).toUpperCase()}
+                          {getSafeDisplayText(availableWorkspace.name, DEFAULT_TEXT.WORKSPACE.DEFAULT_NAME).charAt(0).toUpperCase()}
                         </span>
                       </span>
                       <span className="ml-2 text-xs font-medium">
-                        {availableWorkspace.name}
+                        {getSafeDisplayText(availableWorkspace.name, DEFAULT_TEXT.WORKSPACE.DEFAULT_NAME)}
                       </span>
                     </div>
                     {workspace.name === availableWorkspace.name && (

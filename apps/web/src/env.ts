@@ -27,6 +27,29 @@ export const env = createEnv({
     POSTGRES_URL: z.string().url(),
     TRELLO_APP_API_KEY: z.string().optional(),
     TRELLO_APP_SECRET: z.string().optional(),
+
+    // AI Configuration
+    OPENROUTER_API_KEY: z.string().optional(),
+    AI_MODEL_ID: z.string().optional(),
+    AI_MODEL_NAME: z.string().default("deepseek/deepseek-chat-v3-0324:free"),
+    AI_BASE_URL: z.string().default("https://openrouter.ai/api/v1"),
+
+    // AI Model Parameters
+    AI_TEMPERATURE: z.string().transform((s) => s === "" ? undefined : parseFloat(s)).refine((n) => !n || (n >= 0 && n <= 2), "Temperature must be between 0 and 2").optional(),
+    AI_MAX_TOKENS: z.string().transform((s) => s === "" ? undefined : parseInt(s)).refine((n) => !n || (n >= 1 && n <= 8000), "Max tokens must be between 1 and 8000").optional(),
+    AI_TOP_P: z.string().transform((s) => s === "" ? undefined : parseFloat(s)).refine((n) => !n || (n >= 0 && n <= 1), "Top P must be between 0 and 1").optional(),
+    AI_FREQUENCY_PENALTY: z.string().transform((s) => s === "" ? undefined : parseFloat(s)).refine((n) => !n || (n >= -2 && n <= 2), "Frequency penalty must be between -2 and 2").optional(),
+    AI_PRESENCE_PENALTY: z.string().transform((s) => s === "" ? undefined : parseFloat(s)).refine((n) => !n || (n >= -2 && n <= 2), "Presence penalty must be between -2 and 2").optional(),
+
+    // AI Prompts and Templates
+    AI_SYSTEM_PROMPT: z.string().optional(),
+    AI_KANBAN_PROMPT_TEMPLATE: z.string().optional(),
+
+    // AI Retry and Fallback Configuration
+    AI_MAX_RETRIES: z.string().transform((s) => s === "" ? undefined : parseInt(s)).refine((n) => !n || (n >= 1 && n <= 5), "Max retries must be between 1 and 5").optional(),
+    AI_RETRY_DELAY: z.string().transform((s) => s === "" ? undefined : parseInt(s)).refine((n) => !n || (n >= 100 && n <= 5000), "Retry delay must be between 100 and 5000ms").optional(),
+    AI_ENABLE_FALLBACK: z.string().transform((s) => s === "" ? undefined : s.toLowerCase() === "true").optional(),
+    AI_FALLBACK_LABELS: z.string().optional(),
     STRIPE_SECRET_KEY: z.string().optional(),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
