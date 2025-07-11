@@ -33,6 +33,7 @@ export const boards = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     description: text("description"),
     slug: varchar("slug", { length: 255 }).notNull(),
+    projectIdea: text("projectIdea"), // Store original project idea for AI prompt generation
     createdBy: uuid("createdBy").references(() => users.id, {
       onDelete: "set null",
     }),

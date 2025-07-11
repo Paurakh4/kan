@@ -197,6 +197,27 @@ QUALITY INDICATORS:
       "auth", "payment", "analytics", "notification", "search", "admin"
     ])
   }).default({}),
+
+  // Task Prompt Generation Configuration
+  taskPromptTemplate: z.string().default(`Generate a comprehensive, ready-to-use AI prompt for the following task:
+
+Project: {{projectIdea}}
+Board: {{boardName}}
+Task: {{cardTitle}}
+Description: {{cardDescription}}
+
+Create a prompt that:
+- Defines the AI's role/persona clearly
+- States the specific goal
+- Includes relevant context and requirements
+- Specifies output format and quality expectations
+- Provides step-by-step guidance if needed
+
+Return only the final prompt text that a user can copy and use directly with an AI assistant.`),
+
+  // Task Prompt Generation Model Parameters
+  taskPromptTemperature: z.number().min(0).max(2).default(0.3),
+  taskPromptMaxTokens: z.number().min(1).max(4000).default(2000),
 });
 
 export type AIConfig = z.infer<typeof aiConfigSchema>;
@@ -235,6 +256,11 @@ export function loadAIConfig(): AIConfig {
 
     // Enhanced Label Categories
     labelCategories: process.env.AI_LABEL_CATEGORIES ? JSON.parse(process.env.AI_LABEL_CATEGORIES) : undefined,
+
+    // Task Prompt Generation Configuration
+    taskPromptTemplate: process.env.AI_TASK_PROMPT_TEMPLATE,
+    taskPromptTemperature: process.env.AI_TASK_PROMPT_TEMPERATURE ? parseFloat(process.env.AI_TASK_PROMPT_TEMPERATURE) : undefined,
+    taskPromptMaxTokens: process.env.AI_TASK_PROMPT_MAX_TOKENS ? parseInt(process.env.AI_TASK_PROMPT_MAX_TOKENS) : undefined,
   };
 
   // Remove undefined values to let defaults take effect
@@ -258,6 +284,13 @@ export function getAIConfig(): AIConfig {
 // Helper function to interpolate prompt templates
 export function interpolatePrompt(template: string, variables: Record<string, string>): string {
   return template.replace(/\{(\w+)\}/g, (match, key) => {
+    return variables[key] || match;
+  });
+}
+
+// Helper function to interpolate task prompt templates (supports {{variable}} syntax)
+export function interpolateTaskPrompt(template: string, variables: Record<string, string>): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
     return variables[key] || match;
   });
 }
