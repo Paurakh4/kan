@@ -6,7 +6,9 @@ export default {
   dialect: "postgresql",
   dbCredentials: {
     url: process.env.POSTGRES_URL ?? "",
-    ssl: process.env.NODE_ENV === "production" ? true : false,
+    ssl: {
+      rejectUnauthorized: false, // Required for Supabase pooler
+    },
   },
   migrations: {
     prefix: "timestamp",

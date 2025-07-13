@@ -17,6 +17,9 @@ export const createDrizzleClient = (): dbClient => {
 
   const pool = new Pool({
     connectionString,
+    ssl: {
+      rejectUnauthorized: false, // Required for Supabase
+    },
   });
 
   return drizzlePg(pool, { schema }) as dbClient;

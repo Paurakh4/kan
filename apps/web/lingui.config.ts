@@ -10,6 +10,13 @@ const config: LinguiConfig = {
       exclude: ["**/node_modules/**"],
     },
   ],
+  format: "po",
+  formatOptions: {
+    origins: false,
+    lineNumbers: false,
+  },
+  compileNamespace: "es",
+  extractors: ["babel"],
 };
 
 export default config;

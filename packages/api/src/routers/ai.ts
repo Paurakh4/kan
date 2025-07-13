@@ -65,6 +65,24 @@ function setCachedResponse(projectIdea: string, features: string[], response: AI
   console.log(`[AI] Cached response for project: ${projectIdea}`);
 }
 
+function clearCache(): void {
+  responseCache.clear();
+  console.log(`[AI] Cache cleared`);
+}
+
+function clearProblematicCachedResponses(): void {
+  let clearedCount = 0;
+  for (const [key, cached] of responseCache.entries()) {
+    const totalCards = cached.response.lists.reduce((sum, list) => sum + list.cards.length, 0);
+    // Clear responses with fewer than 3 cards (likely problematic)
+    if (totalCards < 3) {
+      responseCache.delete(key);
+      clearedCount++;
+    }
+  }
+  console.log(`[AI] Cleared ${clearedCount} problematic cached responses`);
+}
+
 // Input validation schema
 const generatePlanInputSchema = z.object({
   boardName: z.string().min(1).max(255),
@@ -146,27 +164,67 @@ const generateFallbackResponse = (projectIdea: string, features: string[]): AIRe
     });
   }
 
-  const fallbackCards = features.slice(0, 6).map((feature, index) => ({
-    title: `Implement ${feature}`,
-    description: `<p><strong>Implement ${feature} functionality</strong> for the project. This task involves developing the core features and ensuring proper integration with the existing system.</p>`,
-    labels: index % 2 === 0
-      ? [config.fallbackLabels[0] || "frontend", "feature"]
-      : [config.fallbackLabels[1] || "backend", "feature"],
-  }));
+  // Generate comprehensive fallback cards (5-8 cards minimum)
+  const fallbackCards = [];
+
+  // Add feature-based cards
+  features.slice(0, 6).forEach((feature, index) => {
+    fallbackCards.push({
+      title: `Implement ${feature}`,
+      description: `<p><strong>Develop ${feature} functionality</strong> for the ${projectIdea} project. This task involves designing, implementing, and testing the core features while ensuring proper integration with the existing system architecture.</p><p><strong>Acceptance Criteria:</strong></p><ul><li>Feature implementation completed</li><li>Unit tests written and passing</li><li>Integration testing completed</li><li>Documentation updated</li></ul>`,
+      labels: index % 2 === 0
+        ? [config.fallbackLabels[0] || "frontend", "feature"]
+        : [config.fallbackLabels[1] || "backend", "feature"],
+    });
+  });
+
+  // Add essential project setup cards if we have fewer than 5 cards
+  if (fallbackCards.length < 5) {
+    const setupCards = [
+      {
+        title: "Project Setup and Environment Configuration",
+        description: `<p><strong>Establish development environment</strong> for the ${projectIdea} project. Configure development tools, dependencies, and deployment pipeline.</p><p><strong>Tasks:</strong></p><ul><li>Set up development environment</li><li>Configure CI/CD pipeline</li><li>Establish code quality tools</li><li>Create project documentation</li></ul>`,
+        labels: ["setup", "backend", "tooling"],
+      },
+      {
+        title: "Database Design and Schema Implementation",
+        description: `<p><strong>Design and implement database schema</strong> to support the ${projectIdea} application requirements. Create efficient data models and relationships.</p><p><strong>Deliverables:</strong></p><ul><li>Database schema design</li><li>Migration scripts</li><li>Data validation rules</li><li>Performance optimization</li></ul>`,
+        labels: ["database", "backend", "setup"],
+      },
+      {
+        title: "User Interface Design and Implementation",
+        description: `<p><strong>Create intuitive user interface</strong> for the ${projectIdea} application. Focus on user experience and responsive design principles.</p><p><strong>Components:</strong></p><ul><li>Wireframes and mockups</li><li>Component library</li><li>Responsive layouts</li><li>Accessibility compliance</li></ul>`,
+        labels: ["frontend", "ui", "design"],
+      },
+      {
+        title: "Testing Strategy and Quality Assurance",
+        description: `<p><strong>Implement comprehensive testing strategy</strong> to ensure reliability and performance of the ${projectIdea} application.</p><p><strong>Testing Types:</strong></p><ul><li>Unit testing</li><li>Integration testing</li><li>End-to-end testing</li><li>Performance testing</li></ul>`,
+        labels: ["testing", "quality", "automation"],
+      },
+    ];
+
+    // Add setup cards until we have at least 5 total cards
+    const cardsNeeded = Math.max(0, 5 - fallbackCards.length);
+    fallbackCards.push(...setupCards.slice(0, cardsNeeded));
+  }
+
+  // Ensure we have at least 5 cards total
+  const totalCards = Math.max(5, fallbackCards.length);
+  const finalCards = fallbackCards.slice(0, totalCards);
 
   return {
     lists: [
       {
         title: "Backlog",
-        cards: fallbackCards.slice(0, 4),
+        cards: finalCards.slice(0, Math.ceil(finalCards.length * 0.6)), // 60% in backlog
       },
       {
         title: "To Do",
-        cards: fallbackCards.slice(4, 6),
+        cards: finalCards.slice(Math.ceil(finalCards.length * 0.6), Math.ceil(finalCards.length * 0.8)), // 20% in to do
       },
       {
         title: "In Progress",
-        cards: [],
+        cards: finalCards.slice(Math.ceil(finalCards.length * 0.8)), // 20% in progress
       },
       {
         title: "Done",
@@ -280,13 +338,24 @@ export const aiRouter = createTRPCRouter({
       try {
         let aiResponse: AIResponse;
 
+        // Clear any problematic cached responses first
+        clearProblematicCachedResponses();
+
         // Check cache first
         const cachedResponse = getCachedResponse(input.projectIdea, input.features);
         if (cachedResponse) {
-          console.log(`[AI] Using cached response - skipping AI generation`);
-          aiResponse = cachedResponse;
+          const totalCards = cachedResponse.lists.reduce((sum, list) => sum + list.cards.length, 0);
+          if (totalCards >= 3) {
+            console.log(`[AI] Using cached response with ${totalCards} cards - skipping AI generation`);
+            aiResponse = cachedResponse;
+          } else {
+            console.log(`[AI] Cached response has insufficient cards (${totalCards}), generating new response`);
+            aiResponse = await generateWithRetry();
+            setCachedResponse(input.projectIdea, input.features, aiResponse);
+          }
         } else {
           // Generate new response
+          console.log(`[AI] No cached response found, generating new response`);
           aiResponse = await generateWithRetry();
 
           // Cache the successful response
