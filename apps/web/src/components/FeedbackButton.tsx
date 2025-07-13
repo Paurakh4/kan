@@ -115,14 +115,14 @@ const FeedbackButton: React.FC = () => {
                   <p className="ml-2 text-xs text-neutral-900 dark:text-dark-1000">
                     {t`Need help?`}{" "}
                     <Link
-                      href="mailto:support@kan.bn"
+                      href="mailto:support@vibeplanify.com"
                       className="text-blue-600 underline dark:text-blue-300"
                     >
                       {t`Contact us`}
                     </Link>
                     {t`, or see our`}{" "}
                     <Link
-                      href="https://docs.kan.bn"
+                      href="https://docs.vibeplanify.com"
                       target="_blank"
                       rel="noreferrer"
                       className="text-blue-600 underline dark:text-blue-300"

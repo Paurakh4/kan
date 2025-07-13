@@ -335,9 +335,9 @@ export default function PrivacyView() {
             </Text>
             <Link
               className="line-height text-md mb-4 text-light-1000 dark:text-dark-900"
-              href="mailto:support@kan.bn"
+              href="mailto:support@vibeplanify.com"
             >
-              support@kan.bn
+              support@vibeplanify.com
             </Link>
           </div>
         </div>

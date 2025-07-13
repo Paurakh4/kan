@@ -7,29 +7,35 @@ import { generateUID } from "@kan/shared/utils";
 export const create = async (
   db: dbClient,
   listInput: {
+    publicId?: string;
     name: string;
     createdBy: string;
     boardId: number;
+    index?: number;
     importId?: number;
   },
 ) => {
   return db.transaction(async (tx) => {
-    const list = await tx.query.lists.findFirst({
-      columns: {
-        id: true,
-        boardId: true,
-        index: true,
-      },
-      where: and(eq(lists.boardId, listInput.boardId), isNull(lists.deletedAt)),
-      orderBy: [desc(lists.index)],
-    });
+    let index = listInput.index;
 
-    const index = list ? list.index + 1 : 0;
+    if (index === undefined) {
+      const list = await tx.query.lists.findFirst({
+        columns: {
+          id: true,
+          boardId: true,
+          index: true,
+        },
+        where: and(eq(lists.boardId, listInput.boardId), isNull(lists.deletedAt)),
+        orderBy: [desc(lists.index)],
+      });
+
+      index = list ? list.index + 1 : 0;
+    }
 
     const [result] = await tx
       .insert(lists)
       .values({
-        publicId: generateUID(),
+        publicId: listInput.publicId ?? generateUID(),
         name: listInput.name,
         createdBy: listInput.createdBy,
         boardId: listInput.boardId,
@@ -197,6 +203,29 @@ export const reorder = async (
   });
 };
 
+export const deleteById = async (
+  db: dbClient,
+  listId: number,
+) => {
+  return db.transaction(async (tx) => {
+    // First, hard delete all cards in this list
+    await tx.execute(sql`
+      DELETE FROM card
+      WHERE "listId" = ${listId};
+    `);
+
+    // Then delete the list itself
+    const [result] = await tx
+      .delete(lists)
+      .where(eq(lists.id, listId))
+      .returning({
+        id: lists.id,
+      });
+
+    return result;
+  });
+};
+
 export const softDeleteAllByBoardId = async (
   db: dbClient,
   args: {
@@ -235,8 +264,11 @@ export const softDeleteById = async (
         boardId: lists.boardId,
       });
 
-    if (!result)
-      throw new Error(`Unable to soft delete list ID ${args.listId}`);
+    if (!result) {
+      // List might already be deleted or doesn't exist - this is acceptable during cleanup
+      console.warn(`List ID ${args.listId} not found or already deleted`);
+      return null;
+    }
 
     await tx.execute(sql`
       UPDATE list

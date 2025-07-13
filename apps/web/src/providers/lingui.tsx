@@ -81,7 +81,7 @@ export function LinguiProviderWrapper({
       value={{ locale, setLocale, availableLocales: [...locales] }}
     >
       <I18nProvider i18n={i18n} key={locale}>
-        {children}
+        {isHydrated ? children : null}
       </I18nProvider>
     </LinguiContext.Provider>
   );

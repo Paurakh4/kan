@@ -27,10 +27,10 @@ const Faqs = () => {
       ),
     },
     {
-      question: t`What's the difference between Kan and Trello?`,
+      question: t`What's the difference between vibeplanify and Trello?`,
       answer: (
         <Text>
-          {t`The main difference between Kan and Trello is that Kan is open source, allowing anyone to view, modify, and contribute to our code. Our cloud offering also offers no restrictions on features for individual use, whereas Trello locks basic features such as the number of boards you can create behind a paywall.`}
+          {t`The main difference between vibeplanify and Trello is that vibeplanify is open source, allowing anyone to view, modify, and contribute to our code. Our cloud offering also offers no restrictions on features for individual use, whereas Trello locks basic features such as the number of boards you can create behind a paywall.`}
         </Text>
       ),
     },
@@ -47,10 +47,10 @@ const Faqs = () => {
       answer: (
         <Text>
           <Trans>
-            Importing your Trello boards into Kan is easy. You can follow our
+            Importing your Trello boards into vibeplanify is easy. You can follow our
             step-by-step guide{" "}
             <Link
-              href="https://docs.kan.bn/imports/trello"
+              href="https://docs.vibeplanify.com/imports/trello"
               className="underline"
             >
               here
@@ -66,11 +66,11 @@ const Faqs = () => {
         <Text>
           <Trans>
             You can get a custom workspace URL, like{" "}
-            <Link href="https://kan.bn/kan" className="underline">
-              kan.bn/kan
+            <Link href="https://vibeplanify.com/vibeplanify" className="underline">
+              vibeplanify.com/vibeplanify
             </Link>
             , by going into your{" "}
-            <Link href="https://kan.bn/settings" className="underline">
+            <Link href="https://vibeplanify.com/settings" className="underline">
               workspace settings
             </Link>{" "}
             and purchasing a pro workspace subscription. All subscriptions help
@@ -93,13 +93,7 @@ const Faqs = () => {
         <Text>
           <Trans>
             We are using the{" "}
-            <Link
-              href="https://github.com/kan-bn/kan/blob/main/LICENSE"
-              className="underline"
-            >
-              AGPL-3.0 license
-            </Link>
-            .
+            AGPL-3.0 license.
           </Trans>
         </Text>
       ),
@@ -111,7 +105,7 @@ const Faqs = () => {
           <Trans>
             You can invite team members by clicking the "Invite" button in the
             top right corner of the{" "}
-            <Link href="https://kan.bn/members" className="underline">
+            <Link href="https://vibeplanify.com/members" className="underline">
               members page
             </Link>{" "}
             and entering their email address. They will receive an email with a
@@ -125,11 +119,7 @@ const Faqs = () => {
       answer: (
         <Text>
           <Trans>
-            You can self-host by following the instructions in our{" "}
-            <Link href="https://github.com/kanbn/kan" className="underline">
-              repo
-            </Link>
-            .
+            You can self-host by following the instructions in our repo.
           </Trans>
         </Text>
       ),
@@ -150,7 +140,7 @@ const Faqs = () => {
           <Trans>
             Find answers to common questions about the project. Can't find what
             you're looking for? Feel free to{" "}
-            <Link href="mailto:support@kan.bn" className="underline">
+            <Link href="mailto:support@vibeplanify.com" className="underline">
               contact us
             </Link>
             .

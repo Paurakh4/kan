@@ -858,7 +858,7 @@ msgstr "Importing from Trello"
 
 #: src/views/home/components/Faqs.tsx:49
 msgid "Importing your Trello boards into Kan is easy. You can follow our step-by-step guide <0>here</0>."
-msgstr "Importing your Trello boards into Kan is easy. You can follow our step-by-step guide <0>here</0>."
+msgstr "Importing your Trello boards into vibeplanify is easy. You can follow our step-by-step guide <0>here</0>."
 
 #: src/views/boards/components/TemplateBoards.tsx:16
 #: src/views/boards/components/TemplateBoards.tsx:22
@@ -950,9 +950,9 @@ msgstr "List"
 msgid "List name"
 msgstr "List name"
 
-#: src/views/auth/login/index.tsx:31
-msgid "Login | kan.bn"
-msgstr "Login | kan.bn"
+#: src/auth/login/index.tsx:31
+msgid "Login | vibeplanify"
+msgstr "Login | vibeplanify"
 
 #: src/components/UserMenu.tsx:144
 msgid "Logout"
@@ -1348,8 +1348,8 @@ msgstr "Sign in"
 
 #: src/views/auth/signup/index.tsx:32
 #: src/views/auth/signup/index.tsx:57
-msgid "Sign up | kan.bn"
-msgstr "Sign up | kan.bn"
+msgid "Sign up | vibeplanify"
+msgstr "Sign up | vibeplanify"
 
 #: src/views/auth/signup/index.tsx:42
 msgid "Sign up disabled"
@@ -1414,7 +1414,7 @@ msgstr "Thank you for your feedback!"
 
 #: src/views/home/components/Faqs.tsx:33
 msgid "The main difference between Kan and Trello is that Kan is open source, allowing anyone to view, modify, and contribute to our code. Our cloud offering also offers no restrictions on features for individual use, whereas Trello locks basic features such as the number of boards you can create behind a paywall."
-msgstr "The main difference between Kan and Trello is that Kan is open source, allowing anyone to view, modify, and contribute to our code. Our cloud offering also offers no restrictions on features for individual use, whereas Trello locks basic features such as the number of boards you can create behind a paywall."
+msgstr "The main difference between vibeplanify and Trello is that vibeplanify is open source, allowing anyone to view, modify, and contribute to our code. Our cloud offering also offers no restrictions on features for individual use, whereas Trello locks basic features such as the number of boards you can create behind a paywall."
 
 #: src/views/home/index.tsx:65
 msgid "The open source <0/> alternative to Trello"
@@ -1672,7 +1672,7 @@ msgstr "What license are you using?"
 
 #: src/views/home/components/Faqs.tsx:30
 msgid "What's the difference between Kan and Trello?"
-msgstr "What's the difference between Kan and Trello?"
+msgstr "What's the difference between vibeplanify and Trello?"
 
 #: src/views/home/components/Faqs.tsx:25
 msgid "When Trello launched in 2011, it blew everyone away with its carefully designed simplicity, but over time (and atlassification) it lost its magic and grew into something closer to \"Jira Lite\". This project is our attempt to recapture the original magic of Trello's simplicity, in open source."
@@ -1753,8 +1753,8 @@ msgid "Yes, we offer an forever free plan for individual use. No restrictions, n
 msgstr "Yes, we offer an forever free plan for individual use. No restrictions, no paywalls, no limits."
 
 #: src/views/home/components/Faqs.tsx:67
-msgid "You can get a custom workspace URL, like <0>kan.bn/kan</0>, by going into your <1>workspace settings</1> and purchasing a pro workspace subscription. All subscriptions help fund the development of the project!"
-msgstr "You can get a custom workspace URL, like <0>kan.bn/kan</0>, by going into your <1>workspace settings</1> and purchasing a pro workspace subscription. All subscriptions help fund the development of the project!"
+msgid "You can get a custom workspace URL, like <0>vibeplanify.com/vibeplanify</0>, by going into your <1>workspace settings</1> and purchasing a pro workspace subscription. All subscriptions help fund the development of the project!"
+msgstr "You can get a custom workspace URL, like <0>vibeplanify.com/vibeplanify</0>, by going into your <1>workspace settings</1> and purchasing a pro workspace subscription. All subscriptions help fund the development of the project!"
 
 #: src/views/home/components/Faqs.tsx:111
 msgid "You can invite team members by clicking the \"Invite\" button in the top right corner of the <0>members page</0> and entering their email address. They will receive an email with a link to join the workspace."

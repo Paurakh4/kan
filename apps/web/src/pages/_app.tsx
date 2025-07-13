@@ -8,7 +8,7 @@ import Script from "next/script";
 import { env } from "next-runtime-env";
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { LinguiProviderWrapper } from "~/providers/lingui";
 import { ModalProvider } from "~/providers/modal";
@@ -35,9 +35,12 @@ export const viewport: Viewport = {
 };
 
 const MyApp: AppType = ({ Component, pageProps }) => {
+  const [isHydrated, setIsHydrated] = useState(false);
   const posthogKey = env("NEXT_PUBLIC_POSTHOG_KEY");
 
   useEffect(() => {
+    setIsHydrated(true);
+
     if (posthogKey) {
       posthog.init(posthogKey, {
         api_host: env("NEXT_PUBLIC_POSTHOG_HOST"),
@@ -73,7 +76,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           <ThemeProvider>
             <ModalProvider>
               <PopupProvider>
-                {posthogKey ? (
+                {isHydrated && posthogKey ? (
                   <PostHogProvider client={posthog}>
                     <Component {...pageProps} />
                   </PostHogProvider>

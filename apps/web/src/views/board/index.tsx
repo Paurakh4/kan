@@ -37,6 +37,7 @@ import UpdateBoardSlugButton from "./components/UpdateBoardSlugButton";
 import { UpdateBoardSlugForm } from "./components/UpdateBoardSlugForm";
 import VisibilityButton from "./components/VisibilityButton";
 import GeneratePlanModal from "~/components/GeneratePlanModal";
+import ReviseProjectModal from "~/components/ReviseProjectModal";
 import { ModalSizeProvider } from "~/components/modal";
 
 type PublicListId = string;
@@ -478,6 +479,9 @@ export default function BoardPage() {
             </ModalSizeProvider>
           )}
           {modalContentType === "GENERATE_PLAN" && <GeneratePlanModal />}
+          {modalContentType === "REVISE_PROJECT" && (
+            <ReviseProjectModal boardPublicId={boardId ?? ""} />
+          )}
         </Modal>
       </div>
     </>

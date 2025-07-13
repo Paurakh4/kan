@@ -10,10 +10,10 @@ const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const menuItems = [
-    { label: t`Roadmap`, href: "/kan/roadmap", openInNewTab: true },
+    { label: t`Roadmap`, href: "/vibeplanify/roadmap", openInNewTab: true },
     { label: t`Features`, href: "#features" },
     { label: t`Pricing`, href: "#pricing" },
-    { label: t`Docs`, href: "https://docs.kan.bn", openInNewTab: true },
+    { label: t`Docs`, href: "https://docs.vibeplanify.com", openInNewTab: true },
   ];
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
             <div className="my-auto flex items-center justify-between">
               <Link href="/">
                 <h1 className="w-[200px] text-lg font-bold tracking-tight text-neutral-900 dark:text-dark-1000">
-                  kan.bn
+                  vibeplanify
                 </h1>
               </Link>
             </div>

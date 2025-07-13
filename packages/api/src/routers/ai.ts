@@ -16,7 +16,8 @@ import {
   validateAndCleanAIResponse,
   type AIResponse
 } from "../config/ai";
-import { safeMarkdownToHTML } from "../utils/markdown-to-html";
+import { safeMarkdownToHTML, ensureHTMLFormat } from "../utils/markdown-to-html";
+import { assertUserInWorkspace } from "../utils/auth";
 
 // Temporary inline generateSlug function until import issue is resolved
 const generateSlug = (text: string): string => {
@@ -29,7 +30,6 @@ const generateSlug = (text: string): string => {
 };
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { assertUserInWorkspace } from "../utils/auth";
 
 // Simple in-memory cache for AI responses (5 minute TTL)
 const responseCache = new Map<string, { response: AIResponse; timestamp: number }>();
@@ -392,7 +392,7 @@ export const aiRouter = createTRPCRouter({
               .filter(Boolean) as { cardId: number; labelId: number }[];
 
             if (cardLabelRelationships.length > 0) {
-              await cardRepo.bulkCreateCardLabelRelationships(ctx.db, cardLabelRelationships);
+              await cardRepo.bulkCreateCardLabelRelationship(ctx.db, cardLabelRelationships);
             }
           }
         }
@@ -527,6 +527,284 @@ export const aiRouter = createTRPCRouter({
         console.error("Task prompt generation error:", error);
         throw new TRPCError({
           message: "Failed to generate task prompt",
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
+    }),
+
+  reviseProject: protectedProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/ai/revise-project",
+        summary: "Revise existing Kanban project",
+        description: "Regenerates an existing board with AI-powered improvements based on user feedback and original project context",
+        tags: ["AI"],
+        protect: true,
+      },
+    })
+    .input(z.object({
+      boardPublicId: z.string().min(12),
+      revisionNotes: z.string().min(10).max(1000),
+    }))
+    .output(z.object({
+      success: z.boolean(),
+      message: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user?.id;
+
+      if (!userId) {
+        throw new TRPCError({
+          message: "User not authenticated",
+          code: "UNAUTHORIZED",
+        });
+      }
+
+      try {
+        // Get the existing board with its original project context
+        const board = await boardRepo.getWithProjectIdeaByPublicId(ctx.db, input.boardPublicId);
+
+        if (!board) {
+          throw new TRPCError({
+            message: `Board with public ID ${input.boardPublicId} not found`,
+            code: "NOT_FOUND",
+          });
+        }
+
+        // Verify user has access to this board
+        await assertUserInWorkspace(ctx.db, userId, board.workspaceId);
+
+        // Check if board has original project idea stored
+        if (!board.projectIdea) {
+          throw new TRPCError({
+            message: "This board was not created with AI generation and cannot be revised",
+            code: "BAD_REQUEST",
+          });
+        }
+
+        // Get current board structure for context
+        const boardWithLists = await boardRepo.getByPublicId(ctx.db, input.boardPublicId, { members: [], labels: [] });
+        const currentStructure = boardWithLists?.lists?.map(list => ({
+          title: list.name,
+          cardCount: list.cards?.length || 0,
+        })) || [];
+
+        // Create enhanced prompt that combines original context with revision notes
+        const config = getAIConfig();
+        const revisionPrompt = `PROJECT REVISION REQUEST
+
+Original Project: ${board.projectIdea}
+Current Board Structure: ${currentStructure.map(list => `${list.title} (${list.cardCount} cards)`).join(", ")}
+
+USER REVISION REQUEST:
+${input.revisionNotes}
+
+INSTRUCTIONS:
+- Maintain the core project vision while incorporating the requested changes
+- Generate an improved board structure based on the revision feedback
+- Ensure the new structure addresses the user's specific requests
+- Keep the professional quality and actionable nature of all cards
+- Include appropriate labels for each card to categorize and organize the work`;
+
+        // Generate new board structure using AI
+        const generateWithRetry = async (): Promise<AIResponse> => {
+          const openai = getOpenAIClient();
+
+          for (let attempt = 1; attempt <= config.maxRetries; attempt++) {
+            try {
+              console.log(`[AI] Revision attempt ${attempt} for board: ${board.name}`);
+
+              const response = await openai.chat.completions.create({
+                model: config.modelId,
+                messages: [
+                  {
+                    role: "system",
+                    content: config.systemPrompt,
+                  },
+                  {
+                    role: "user",
+                    content: revisionPrompt,
+                  },
+                ],
+                temperature: config.temperature,
+                max_tokens: config.maxTokens,
+                top_p: config.topP,
+                frequency_penalty: config.frequencyPenalty,
+                presence_penalty: config.presencePenalty,
+              });
+
+              const aiResponseText = response.choices[0]?.message?.content?.trim();
+
+              if (!aiResponseText) {
+                throw new Error("Empty AI response");
+              }
+
+              // Validate and clean the AI response
+              const validatedResponse = validateAndCleanAIResponse(aiResponseText);
+              console.log(`[AI] Revision attempt ${attempt} - Validation successful`);
+              console.log(`[AI] Generated ${validatedResponse.lists.length} lists`);
+              validatedResponse.lists.forEach((list, index) => {
+                console.log(`[AI] List ${index + 1}: "${list.title}" with ${list.cards.length} cards`);
+                list.cards.forEach((card, cardIndex) => {
+                  console.log(`[AI] Card ${cardIndex + 1}: "${card.title}" with ${card.labels?.length || 0} labels: ${card.labels?.join(', ') || 'none'}`);
+                });
+              });
+
+              return validatedResponse;
+
+            } catch (error) {
+              console.error(`Revision attempt ${attempt} failed:`, error);
+
+              if (attempt === config.maxRetries) {
+                console.log(`[AI] Revision failed after ${config.maxRetries} attempts, using fallback response`);
+                // For revision, we'll use a simplified fallback that maintains existing structure
+                return {
+                  lists: currentStructure.map(list => ({
+                    title: list.title,
+                    cards: [],
+                  })),
+                };
+              }
+
+              // Wait before retry
+              await new Promise(resolve => setTimeout(resolve, config.retryDelay * attempt));
+            }
+          }
+
+          throw new Error("Unexpected end of retry loop");
+        };
+
+        const aiResponse = await generateWithRetry();
+
+        // Clear existing board content (lists, cards, and labels)
+        const boardWithListIds = await boardRepo.getWithListIdsByPublicId(ctx.db, input.boardPublicId);
+        if (boardWithListIds?.lists) {
+          for (const list of boardWithListIds.lists) {
+            await listRepo.softDeleteById(ctx.db, {
+              listId: list.id,
+              deletedAt: new Date(),
+              deletedBy: userId,
+            });
+          }
+        }
+
+        // Clean up existing labels for this board (they will be recreated)
+        await labelRepo.softDeleteAllByBoardId(ctx.db, {
+          boardId: board.id,
+          deletedAt: new Date(),
+          deletedBy: userId,
+        });
+
+        console.log(`[AI] Cleared existing content for board: ${board.name}`);
+
+        // Use the same efficient approach as generatePlan
+        // Collect all unique labels from AI response
+        const allLabels = new Set<string>();
+        aiResponse.lists.forEach(list => {
+          list.cards.forEach(card => {
+            card.labels?.forEach(label => allLabels.add(label));
+          });
+        });
+
+        console.log(`[AI] Found ${allLabels.size} unique labels: ${Array.from(allLabels).join(', ')}`);
+
+        // Create labels using bulk operation
+        const labelInputs = Array.from(allLabels).map((labelName, index) => ({
+          publicId: generateUID(),
+          name: labelName,
+          boardId: board.id,
+          createdBy: userId,
+          colourCode: colours[index % colours.length]?.code || "#6B7280",
+        }));
+
+        const createdLabels = labelInputs.length > 0
+          ? await labelRepo.bulkCreate(ctx.db, labelInputs)
+          : [];
+
+        console.log(`[AI] Created ${createdLabels.length} labels`);
+
+        // Create a map of label names to IDs for efficient lookup
+        const labelNameToId = new Map<string, number>();
+        labelInputs.forEach((labelInput, index) => {
+          const createdLabel = createdLabels[index];
+          if (createdLabel) {
+            labelNameToId.set(labelInput.name, createdLabel.id);
+            console.log(`[AI] Mapped label "${labelInput.name}" to ID ${createdLabel.id}`);
+          }
+        });
+
+        // Create lists and cards using bulk operations
+        const listInputs = aiResponse.lists.map((list, index) => ({
+          publicId: generateUID(),
+          name: list.title,
+          boardId: board.id,
+          createdBy: userId,
+          index,
+        }));
+
+        const createdLists = await listRepo.bulkCreate(ctx.db, listInputs);
+        console.log(`[AI] Created ${createdLists.length} lists`);
+
+        // Create cards for each list
+        for (const [listIndex, aiList] of aiResponse.lists.entries()) {
+          const targetList = createdLists[listIndex];
+          if (!targetList || aiList.cards.length === 0) continue;
+
+          const cardInputs = aiList.cards.map((card, cardIndex) => ({
+            publicId: generateUID(),
+            title: card.title,
+            description: ensureHTMLFormat(card.description || ""),
+            listId: targetList.id,
+            createdBy: userId,
+            index: cardIndex,
+          }));
+
+          const createdCards = await cardRepo.bulkCreate(ctx.db, cardInputs);
+          console.log(`[AI] Created ${createdCards.length} cards for list "${aiList.title}"`);
+
+          // Create card-label relationships using bulk operation
+          for (const [cardIndex, aiCard] of aiList.cards.entries()) {
+            const targetCard = createdCards[cardIndex];
+            if (!targetCard || !aiCard.labels?.length) continue;
+
+            console.log(`[AI] Processing ${aiCard.labels.length} labels for card: ${aiCard.title}`);
+
+            const cardLabelRelationships = aiCard.labels
+              .map(labelName => {
+                const labelId = labelNameToId.get(labelName);
+                if (labelId) {
+                  console.log(`[AI] Mapping label "${labelName}" (ID: ${labelId}) to card "${aiCard.title}" (ID: ${targetCard.id})`);
+                  return { cardId: targetCard.id, labelId };
+                } else {
+                  console.log(`[AI] Warning: Label "${labelName}" not found in label map`);
+                  return null;
+                }
+              })
+              .filter(Boolean) as { cardId: number; labelId: number }[];
+
+            if (cardLabelRelationships.length > 0) {
+              await cardRepo.bulkCreateCardLabelRelationship(ctx.db, cardLabelRelationships);
+              console.log(`[AI] Created ${cardLabelRelationships.length} label relationships for card: ${aiCard.title}`);
+            }
+          }
+        }
+
+        console.log(`[AI] Successfully revised board: ${board.name}`);
+
+        return {
+          success: true,
+          message: "Board revised successfully",
+        };
+
+      } catch (error) {
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+
+        console.error("AI project revision error:", error);
+        throw new TRPCError({
+          message: "Failed to revise project",
           code: "INTERNAL_SERVER_ERROR",
         });
       }

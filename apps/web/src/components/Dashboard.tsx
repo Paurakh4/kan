@@ -103,7 +103,7 @@ export default function Dashboard({
 
             <Link href="/" className="hidden md:block">
               <h1 className="text-lg font-bold tracking-tight text-neutral-900 dark:text-dark-1000">
-                kan.bn
+                vibeplanify
               </h1>
             </Link>
 

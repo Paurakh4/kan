@@ -566,8 +566,8 @@ export const messages: Messages = {
   "Importing from Trello": [
     "Importing from Trello"
   ],
-  "Importing your Trello boards into Kan is easy. You can follow our step-by-step guide <0>here</0>.": [
-    "Importing your Trello boards into Kan is easy. You can follow our step-by-step guide <0>here</0>."
+  "Importing your Trello boards into vibeplanify is easy. You can follow our step-by-step guide <0>here</0>.": [
+    "Importing your Trello boards into vibeplanify is easy. You can follow our step-by-step guide <0>here</0>."
   ],
   "In Progress": [
     "In Progress"
@@ -632,8 +632,8 @@ export const messages: Messages = {
   "List name": [
     "List name"
   ],
-  "Login | kan.bn": [
-    "Login | kan.bn"
+  "Login | vibeplanify": [
+    "Login | vibeplanify"
   ],
   "Logout": [
     "Logout"
@@ -896,8 +896,8 @@ export const messages: Messages = {
   "Sign in": [
     "Sign in"
   ],
-  "Sign up | kan.bn": [
-    "Sign up | kan.bn"
+  "Sign up | vibeplanify": [
+    "Sign up | vibeplanify"
   ],
   "Sign up disabled": [
     "Sign up disabled"
@@ -944,8 +944,8 @@ export const messages: Messages = {
   "Thank you for your feedback!": [
     "Thank you for your feedback!"
   ],
-  "The main difference between Kan and Trello is that Kan is open source, allowing anyone to view, modify, and contribute to our code. Our cloud offering also offers no restrictions on features for individual use, whereas Trello locks basic features such as the number of boards you can create behind a paywall.": [
-    "The main difference between Kan and Trello is that Kan is open source, allowing anyone to view, modify, and contribute to our code. Our cloud offering also offers no restrictions on features for individual use, whereas Trello locks basic features such as the number of boards you can create behind a paywall."
+  "The main difference between vibeplanify and Trello is that vibeplanify is open source, allowing anyone to view, modify, and contribute to our code. Our cloud offering also offers no restrictions on features for individual use, whereas Trello locks basic features such as the number of boards you can create behind a paywall.": [
+    "The main difference between vibeplanify and Trello is that vibeplanify is open source, allowing anyone to view, modify, and contribute to our code. Our cloud offering also offers no restrictions on features for individual use, whereas Trello locks basic features such as the number of boards you can create behind a paywall."
   ],
   "The open source <0/> alternative to Trello": [
     "The open source <0/> alternative to Trello"
@@ -1127,8 +1127,8 @@ export const messages: Messages = {
   "What license are you using?": [
     "What license are you using?"
   ],
-  "What's the difference between Kan and Trello?": [
-    "What's the difference between Kan and Trello?"
+  "What's the difference between vibeplanify and Trello?": [
+    "What's the difference between vibeplanify and Trello?"
   ],
   "When Trello launched in 2011, it blew everyone away with its carefully designed simplicity, but over time (and atlassification) it lost its magic and grew into something closer to \"Jira Lite\". This project is our attempt to recapture the original magic of Trello's simplicity, in open source.": [
     "When Trello launched in 2011, it blew everyone away with its carefully designed simplicity, but over time (and atlassification) it lost its magic and grew into something closer to \"Jira Lite\". This project is our attempt to recapture the original magic of Trello's simplicity, in open source."
@@ -1184,8 +1184,8 @@ export const messages: Messages = {
   "Yes, we offer an forever free plan for individual use. No restrictions, no paywalls, no limits.": [
     "Yes, we offer an forever free plan for individual use. No restrictions, no paywalls, no limits."
   ],
-  "You can get a custom workspace URL, like <0>kan.bn/kan</0>, by going into your <1>workspace settings</1> and purchasing a pro workspace subscription. All subscriptions help fund the development of the project!": [
-    "You can get a custom workspace URL, like <0>kan.bn/kan</0>, by going into your <1>workspace settings</1> and purchasing a pro workspace subscription. All subscriptions help fund the development of the project!"
+  "You can get a custom workspace URL, like <0>vibeplanify.com/vibeplanify</0>, by going into your <1>workspace settings</1> and purchasing a pro workspace subscription. All subscriptions help fund the development of the project!": [
+    "You can get a custom workspace URL, like <0>vibeplanify.com/vibeplanify</0>, by going into your <1>workspace settings</1> and purchasing a pro workspace subscription. All subscriptions help fund the development of the project!"
   ],
   "You can invite team members by clicking the \"Invite\" button in the top right corner of the <0>members page</0> and entering their email address. They will receive an email with a link to join the workspace.": [
     "You can invite team members by clicking the \"Invite\" button in the top right corner of the <0>members page</0> and entering their email address. They will receive an email with a link to join the workspace."

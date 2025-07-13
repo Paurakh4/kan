@@ -145,3 +145,63 @@ export const getWorkspaceAndLabelIdByLabelPublicId = async (
       }
     : null;
 };
+
+export const getByNameAndBoardId = async (
+  db: dbClient,
+  name: string,
+  boardId: number,
+) => {
+  return db.query.labels.findFirst({
+    columns: {
+      id: true,
+      publicId: true,
+      name: true,
+      colourCode: true,
+    },
+    where: and(
+      eq(labels.name, name),
+      eq(labels.boardId, boardId),
+      isNull(labels.deletedAt)
+    ),
+  });
+};
+
+export const addToCard = async (
+  db: dbClient,
+  args: { labelId: number; cardId: number },
+) => {
+  const [result] = await db
+    .insert(cardsToLabels)
+    .values({
+      cardId: args.cardId,
+      labelId: args.labelId,
+    })
+    .returning();
+
+  return result;
+};
+
+export const softDeleteAllByBoardId = async (
+  db: dbClient,
+  args: {
+    boardId: number;
+    deletedAt: Date;
+    deletedBy: string;
+  },
+) => {
+  const result = await db
+    .update(labels)
+    .set({
+      deletedAt: args.deletedAt,
+      deletedBy: args.deletedBy
+    })
+    .where(and(
+      eq(labels.boardId, args.boardId),
+      isNull(labels.deletedAt)
+    ))
+    .returning({
+      id: labels.id,
+    });
+
+  return result;
+};

@@ -38,12 +38,12 @@ export const JoinWorkspaceTemplate = ({
             color: "#232323",
           }}
         >
-          kan.bn
+          vibeplanify
         </Heading>
         <Heading
           style={{ fontSize: "24px", fontWeight: "bold", color: "#232323" }}
         >
-          Login to your Kan account
+          Login to your vibeplanify account
         </Heading>
         <Text
           style={{
@@ -95,7 +95,7 @@ export const JoinWorkspaceTemplate = ({
             target="_blank"
             style={{ color: "#7e7e7e", textDecoration: "underline" }}
           >
-            Kan
+            vibeplanify
           </Link>
           , the open source Trello alternative.
         </Text>

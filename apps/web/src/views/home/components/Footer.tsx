@@ -34,16 +34,11 @@ const Footer = () => {
     ],
     company: [
       { name: t`Roadmap`, href: "/kan/roadmap" },
-      { name: t`GitHub`, href: "https://github.com/kanbn/kan" },
       { name: t`Contact`, href: "mailto:support@kan.bn" },
     ],
     legal: [
       { name: t`Terms of service`, href: "/terms" },
       { name: t`Privacy policy`, href: "/privacy" },
-      {
-        name: t`License`,
-        href: "https://github.com/kanbn/kan?tab=AGPL-3.0-1-ov-file#readme",
-      },
     ],
     resources: [
       { name: t`Features`, href: "/#features" },
@@ -58,9 +53,6 @@ const Footer = () => {
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div>
             <div className="mb-2 flex items-center gap-2">
-              <Link href="https://github.com/kanbn/kan" target="_blank">
-                <FaGithub className="h-8 w-8 rounded-lg border border-light-300 p-1.5 text-light-1000 hover:bg-light-100 dark:border-dark-300 dark:text-dark-1000 dark:hover:bg-dark-100" />
-              </Link>
               <Link href="https://discord.gg/e6ejRb6CmT" target="_blank">
                 <FaDiscord className="h-8 w-8 rounded-lg border border-light-300 p-1.5 text-light-1000 hover:bg-light-100 dark:border-dark-300 dark:text-dark-1000 dark:hover:bg-dark-100" />
               </Link>

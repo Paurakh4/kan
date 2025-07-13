@@ -21,8 +21,11 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
     "light" | "dark" | "system"
   >("system");
   const [activeTheme, setActiveTheme] = useState<"light" | "dark">("light");
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const switchTheme = (theme: "light" | "dark" | "system") => {
+    if (typeof window === "undefined") return;
+
     if (theme === "system") {
       localStorage.removeItem("theme");
       const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -38,6 +41,9 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === "undefined") return;
+
     if (!("theme" in localStorage)) {
       const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       document.documentElement.classList.toggle("dark", isDark);
@@ -49,13 +55,15 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
       setActiveTheme(isDark ? "dark" : "light");
       setThemePreference(localStorage.theme as "light" | "dark");
     }
+
+    setIsHydrated(true);
   }, []);
 
   return (
     <ThemeContext.Provider
       value={{ switchTheme, themePreference, activeTheme }}
     >
-      {themePreference.length ? children : null}
+      {isHydrated ? children : null}
     </ThemeContext.Provider>
   );
 };

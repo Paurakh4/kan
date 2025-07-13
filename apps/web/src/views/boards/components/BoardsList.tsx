@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { t } from "@lingui/core/macro";
-import { HiOutlineRectangleStack } from "react-icons/hi2";
+import { HiOutlineRectangleStack, HiSparkles } from "react-icons/hi2";
 
 import { DEFAULT_TEXT, getSafeDisplayText } from "@kan/shared/constants";
 
@@ -40,9 +40,20 @@ export function BoardsList() {
             {t`Get started by creating a new board`}
           </p>
         </div>
-        <Button onClick={() => openModal("NEW_BOARD")}>
-          {t`Create new board`}
-        </Button>
+        <div className="flex flex-col items-center space-y-3">
+          <Button
+            onClick={() => openModal("GENERATE_PLAN")}
+            iconLeft={<HiSparkles className="h-4 w-4" />}
+          >
+            {t`Generate Plan`}
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => openModal("NEW_BOARD")}
+          >
+            {t`Create board manually`}
+          </Button>
+        </div>
       </div>
     );
 
