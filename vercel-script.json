@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm --filter @kan/web build",
+  "buildCommand": "pnpm build:vercel",
   "outputDirectory": "apps/web/.next",
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": null,
