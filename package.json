@@ -8,7 +8,6 @@
   "packageManager": "pnpm@9.14.2",
   "scripts": {
     "build": "turbo run build",
-    "build:web": "cd apps/web && pnpm lingui:compile && pnpm with-env next build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo run clean",
     "db:migrate": "cd packages/db && pnpm migrate",
