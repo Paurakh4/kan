@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { t } from "@lingui/core/macro";
-import { HiXMark, HiSparkles } from "react-icons/hi2";
+import { HiXMark } from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,6 +10,49 @@ import Button from "~/components/Button";
 import { useModal } from "~/providers/modal";
 import { usePopup } from "~/providers/popup";
 import { api } from "~/utils/api";
+import { useTheme } from "~/providers/theme";
+
+const AiIcon = (props: React.SVGProps<SVGSVGElement>) => {
+  const { activeTheme } = useTheme();
+  const isDark = activeTheme === "dark";
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="1em" height="1em" viewBox="0 0 24 24" {...props}>
+      {isDark ? (
+        // Use solid color in dark mode (original color)
+        <g>
+          <path fill="#a78bfa" d="M12.136,4.763l1.574,3.591c0.379,0.865,1.07,1.556,1.936,1.936l3.591,1.574 c0.99,0.434,0.99,1.838,0,2.271l-3.591,1.574c-0.865,0.379-1.556,1.07-1.936,1.936l-1.574,3.591c-0.434,0.99-1.838,0.99-2.271,0 L8.29,17.646c-0.379-0.865-1.07-1.556-1.936-1.936l-3.591-1.574c-0.99-0.434-0.99-1.838,0-2.271l3.591-1.574 C7.219,9.91,7.91,9.219,8.29,8.354l1.574-3.591C10.298,3.773,11.702,3.773,12.136,4.763z" />
+          <path fill="#a78bfa" d="M11,4.521 c0.303,0,0.556,0.166,0.678,0.443l1.574,3.591c0.431,0.983,1.21,1.762,2.193,2.193l3.591,1.574 c0.277,0.122,0.443,0.375,0.443,0.678s-0.166,0.556-0.443,0.678l-3.591,1.574c-0.983,0.431-1.762,1.21-2.193,2.193l-1.574,3.591 c-0.122,0.277-0.375,0.443-0.678,0.443s-0.556-0.166-0.678-0.443l-1.574-3.591c-0.431-0.983-1.21-1.762-2.193-2.193l-3.591-1.574 C2.686,13.556,2.521,13.303,2.521,13s0.166-0.556,0.443-0.678l3.591-1.574c0.983-0.431,1.762-1.21,2.193-2.193l1.574-3.591 C10.444,4.686,10.697,4.521,11,4.521z" />
+          <circle fill="#a78bfa" cx="19" cy="5" r="2" />
+        </g>
+      ) : (
+        // Use gradient in light mode
+        <g>
+          <linearGradient id="aiicon-light-1" x1="6.251" x2="15.749" y1="8.251" y2="17.749" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#888" stopOpacity="1" />
+            <stop offset="1" stopColor="#444" stopOpacity="1" />
+          </linearGradient>
+          <linearGradient id="aiicon-light-2" x1="6.251" x2="15.749" y1="8.251" y2="17.749" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#888" stopOpacity="1" />
+            <stop offset=".493" stopColor="#888" stopOpacity="0" />
+            <stop offset=".997" stopColor="#444" stopOpacity="1" />
+          </linearGradient>
+          <linearGradient id="aiicon-light-3" x1="17.387" x2="20.613" y1="3.387" y2="6.613" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#888" stopOpacity="1" />
+            <stop offset="1" stopColor="#444" stopOpacity="1" />
+          </linearGradient>
+          <linearGradient id="aiicon-light-4" x1="17.387" x2="20.613" y1="3.387" y2="6.613" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#888" stopOpacity="1" />
+            <stop offset=".493" stopColor="#888" stopOpacity="0" />
+            <stop offset=".997" stopColor="#444" stopOpacity="1" />
+          </linearGradient>
+          <path fill="url(#aiicon-light-1)" d="M12.136,4.763l1.574,3.591c0.379,0.865,1.07,1.556,1.936,1.936l3.591,1.574 c0.99,0.434,0.99,1.838,0,2.271l-3.591,1.574c-0.865,0.379-1.556,1.07-1.936,1.936l-1.574,3.591c-0.434,0.99-1.838,0.99-2.271,0 L8.29,17.646c-0.379-0.865-1.07-1.556-1.936-1.936l-3.591-1.574c-0.99-0.434-0.99-1.838,0-2.271l3.591-1.574 C7.219,9.91,7.91,9.219,8.29,8.354l1.574-3.591C10.298,3.773,11.702,3.773,12.136,4.763z" />
+          <path fill="url(#aiicon-light-2)" d="M11,4.521 c0.303,0,0.556,0.166,0.678,0.443l1.574,3.591c0.431,0.983,1.21,1.762,2.193,2.193l3.591,1.574 c0.277,0.122,0.443,0.375,0.443,0.678s-0.166,0.556-0.443,0.678l-3.591,1.574c-0.983,0.431-1.762,1.21-2.193,2.193l-1.574,3.591 c-0.122,0.277-0.375,0.443-0.678,0.443s-0.556-0.166-0.678-0.443l-1.574-3.591c-0.431-0.983-1.21-1.762-2.193-2.193l-3.591-1.574 C2.686,13.556,2.521,13.303,2.521,13s0.166-0.556,0.443-0.678l3.591-1.574c0.983-0.431,1.762-1.21,2.193-2.193l1.574-3.591 C10.444,4.686,10.697,4.521,11,4.521z" />
+          <circle fill="url(#aiicon-light-3)" cx="19" cy="5" r="2" />
+        </g>
+      )}
+    </svg>
+  );
+};
 
 // Form validation schema
 const reviseProjectSchema = z.object({
@@ -72,7 +115,7 @@ export default function ReviseProjectModal({ boardPublicId }: ReviseProjectModal
     <div className="p-5">
       <div className="flex w-full items-center justify-between pb-4">
         <div className="flex items-center gap-2">
-          <HiSparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+          <AiIcon className="h-5 w-5" />
           <h2 className="text-lg font-semibold text-neutral-900 dark:text-dark-1000">
             {t`Revise Project`}
           </h2>
@@ -139,7 +182,7 @@ Examples:
             type="submit"
             isLoading={reviseProject.isPending}
             disabled={reviseProject.isPending}
-            iconLeft={<HiSparkles className="h-4 w-4" />}
+            iconLeft={<AiIcon className="h-4 w-4" />}
           >
             {reviseProject.isPending ? t`Regenerating...` : t`Regenerate Board`}
           </Button>
