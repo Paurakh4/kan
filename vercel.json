@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "echo '🔧 Initial working directory:' && pwd && echo '🔧 Listing current directory:' && ls -la && echo '🔧 Looking for apps directory:' && find . -name 'apps' -type d 2>/dev/null || echo 'apps directory not found' && echo '🔧 Looking for web directory:' && find . -name 'web' -type d 2>/dev/null || echo 'web directory not found' && echo '🔧 Attempting to navigate to apps/web:' && cd apps/web && echo '🔧 Successfully in apps/web:' && pwd && NEXT_PUBLIC_USE_STANDALONE_OUTPUT=false pnpm build && echo '🔧 Build output verification:' && ls -la .next/",
+  "buildCommand": "pwd && ls -la apps/web && cd apps/web && pwd && NEXT_PUBLIC_USE_STANDALONE_OUTPUT=false pnpm build",
   "outputDirectory": "apps/web/.next",
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": null,
