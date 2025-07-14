@@ -166,9 +166,6 @@ export function Auth({ setIsMagicLinkSent, isSignUp }: AuthProps) {
     queryFn: () => authClient.getSocialProviders(),
   });
 
-  // Debug: Log social providers (remove after testing)
-  console.log("Social providers loaded:", socialProviders);
-
   const handleLoginWithEmail = async (
     email: string,
     password?: string,
