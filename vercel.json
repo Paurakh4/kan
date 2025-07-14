@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm build:vercel-debug",
+  "buildCommand": "pwd && ls -la apps/web/ && cd apps/web && pwd && NEXT_PUBLIC_USE_STANDALONE_OUTPUT=false pnpm build && ls -la .next/",
   "outputDirectory": "apps/web/.next",
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": null,
