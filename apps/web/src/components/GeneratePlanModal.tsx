@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import { t } from "@lingui/core/macro";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { HiPlus, HiTrash, HiSparkles } from "react-icons/hi2";
+import { HiPlus, HiTrash } from "react-icons/hi2";
 import { z } from "zod";
 
 import Button from "~/components/Button";
@@ -13,6 +13,7 @@ import { usePopup } from "~/providers/popup";
 import { useWorkspace } from "~/providers/workspace";
 import { useTheme } from "~/providers/theme";
 import { api } from "~/utils/api";
+import { AILoadingManager, LoadingState, defaultLoadingConfig } from "@kan/shared";
 
 // Form validation schema - defined inside component to access t function
 const createGeneratePlanSchema = () => z.object({
@@ -81,11 +82,105 @@ const AiIcon = (props: React.SVGProps<SVGSVGElement>) => {
   );
 };
 
+// Enhanced Progress Button Component
+interface ProgressButtonProps {
+  isLoading: boolean;
+  disabled: boolean;
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+  type?: "button" | "submit" | "reset";
+}
+
+const ProgressButton: React.FC<ProgressButtonProps> = ({
+  isLoading,
+  disabled,
+  children,
+  icon,
+  type = "button"
+}) => {
+  const [loadingState, setLoadingState] = useState<LoadingState | null>(null);
+  const loadingManagerRef = useRef<AILoadingManager | null>(null);
+
+  useEffect(() => {
+    if (isLoading && !loadingManagerRef.current) {
+      // Start the loading animation only when actually loading
+      loadingManagerRef.current = new AILoadingManager(defaultLoadingConfig);
+      loadingManagerRef.current.start((state) => {
+        // Only update state if still loading to prevent premature completion
+        if (isLoading) {
+          setLoadingState(state);
+        }
+      });
+    } else if (!isLoading) {
+      // When loading stops, immediately clean up
+      if (loadingManagerRef.current) {
+        loadingManagerRef.current.stop();
+        loadingManagerRef.current = null;
+      }
+      setLoadingState(null);
+    }
+
+    return () => {
+      if (loadingManagerRef.current) {
+        loadingManagerRef.current.stop();
+        loadingManagerRef.current = null;
+      }
+    };
+  }, [isLoading]);
+
+  // Calculate progress more conservatively - never reach 100% until actually done
+  const progress = isLoading && loadingState ? Math.min(loadingState.progress * 0.9, 90) : 0;
+  const currentMessage = loadingState?.currentMessage || '';
+
+  return (
+    <button
+      type={type}
+      disabled={disabled}
+      className={`relative overflow-hidden inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold text-light-50 shadow-sm focus-visible:outline-none bg-light-1000 dark:bg-dark-1000 dark:text-dark-50 disabled:opacity-60 w-[180px] h-[40px] transition-all duration-300 ${isLoading ? 'shadow-lg' : 'hover:shadow-md'}`}
+    >
+      {/* Progress Bar Background */}
+      {isLoading && (
+        <>
+          {/* Background overlay */}
+          <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700" />
+          {/* Simple progress fill */}
+          <div
+            className="absolute inset-0 bg-blue-600 dark:bg-blue-500 transition-all duration-500 ease-out"
+            style={{
+              width: `${progress}%`,
+              transformOrigin: 'left'
+            }}
+          />
+        </>
+      )}
+
+      {/* Content */}
+      <div className="relative z-10 flex items-center justify-center w-full">
+        {isLoading ? (
+          <div className="flex items-center justify-center overflow-hidden">
+            <span
+              key={`${currentMessage}-${loadingState?.currentStage}`}
+              className="animate-slide-down text-white font-medium text-sm whitespace-nowrap"
+            >
+              {currentMessage}
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center">
+            {icon && <span className="mr-2">{icon}</span>}
+            {children}
+          </div>
+        )}
+      </div>
+    </button>
+  );
+};
+
 export default function GeneratePlanModal() {
   const router = useRouter();
   const { closeModal } = useModal();
   const { showPopup } = usePopup();
-  const { workspace, isLoading: workspaceLoading, hasLoaded } = useWorkspace();
+  const { workspace, hasLoaded } = useWorkspace();
   const [features, setFeatures] = useState<string[]>([""]);
 
   const {
@@ -93,7 +188,6 @@ export default function GeneratePlanModal() {
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
   } = useForm<GeneratePlanFormData>({
     resolver: zodResolver(createGeneratePlanSchema()),
     defaultValues: {
@@ -291,14 +385,14 @@ export default function GeneratePlanModal() {
           >
             {t`Cancel`}
           </Button>
-          <Button
+          <ProgressButton
             type="submit"
             isLoading={generatePlan.isPending}
             disabled={generatePlan.isPending || !isWorkspaceReady}
+            icon={<AiIcon className="h-4 w-4" />}
           >
-            <AiIcon className="h-4 w-4 mr-2" />
-            {generatePlan.isPending ? t`Generating...` : !hasLoaded ? t`Loading workspace...` : t`Generate Plan`}
-          </Button>
+            {!hasLoaded ? t`Loading workspace...` : t`Generate Plan`}
+          </ProgressButton>
         </div>
       </form>
     </div>
