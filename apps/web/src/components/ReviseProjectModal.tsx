@@ -12,20 +12,38 @@ import { usePopup } from "~/providers/popup";
 import { api } from "~/utils/api";
 import { useTheme } from "~/providers/theme";
 
-const AiIcon = (props: React.SVGProps<SVGSVGElement>) => {
+const AiIcon = (props: React.SVGProps<SVGSVGElement> & { variant?: 'default' | 'button' }) => {
   const { activeTheme } = useTheme();
   const isDark = activeTheme === "dark";
+  const { variant = 'default', ...svgProps } = props;
+  const forceLight = variant === 'button';
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="1em" height="1em" viewBox="0 0 24 24" {...props}>
-      {isDark ? (
-        // Use solid color in dark mode (original color)
-        <g>
-          <path fill="#a78bfa" d="M12.136,4.763l1.574,3.591c0.379,0.865,1.07,1.556,1.936,1.936l3.591,1.574 c0.99,0.434,0.99,1.838,0,2.271l-3.591,1.574c-0.865,0.379-1.556,1.07-1.936,1.936l-1.574,3.591c-0.434,0.99-1.838,0.99-2.271,0 L8.29,17.646c-0.379-0.865-1.07-1.556-1.936-1.936l-3.591-1.574c-0.99-0.434-0.99-1.838,0-2.271l3.591-1.574 C7.219,9.91,7.91,9.219,8.29,8.354l1.574-3.591C10.298,3.773,11.702,3.773,12.136,4.763z" />
-          <path fill="#a78bfa" d="M11,4.521 c0.303,0,0.556,0.166,0.678,0.443l1.574,3.591c0.431,0.983,1.21,1.762,2.193,2.193l3.591,1.574 c0.277,0.122,0.443,0.375,0.443,0.678s-0.166,0.556-0.443,0.678l-3.591,1.574c-0.983,0.431-1.762,1.21-2.193,2.193l-1.574,3.591 c-0.122,0.277-0.375,0.443-0.678,0.443s-0.556-0.166-0.678-0.443l-1.574-3.591c-0.431-0.983-1.21-1.762-2.193-2.193l-3.591-1.574 C2.686,13.556,2.521,13.303,2.521,13s0.166-0.556,0.443-0.678l3.591-1.574c0.983-0.431,1.762-1.21,2.193-2.193l1.574-3.591 C10.444,4.686,10.697,4.521,11,4.521z" />
-          <circle fill="#a78bfa" cx="19" cy="5" r="2" />
-        </g>
+    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="1em" height="1em" viewBox="0 0 24 24" {...svgProps}>
+      {(isDark && !forceLight) ? (
+        <>
+          <linearGradient id="aiicon-dark-1" x1="6.251" x2="15.749" y1="8.251" y2="17.749" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#fff" stopOpacity=".6" />
+            <stop offset="1" stopColor="#fff" stopOpacity=".3" />
+          </linearGradient>
+          <linearGradient id="aiicon-dark-2" x1="6.251" x2="15.749" y1="8.251" y2="17.749" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#fff" stopOpacity=".6" />
+            <stop offset=".493" stopColor="#fff" stopOpacity="0" />
+            <stop offset=".997" stopColor="#fff" stopOpacity=".3" />
+          </linearGradient>
+          <linearGradient id="aiicon-dark-3" x1="17.387" x2="20.613" y1="3.387" y2="6.613" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#fff" stopOpacity=".6" />
+            <stop offset="1" stopColor="#fff" stopOpacity=".3" />
+          </linearGradient>
+          <linearGradient id="aiicon-dark-4" x1="17.387" x2="20.613" y1="3.387" y2="6.613" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#fff" stopOpacity=".6" />
+            <stop offset=".493" stopColor="#fff" stopOpacity="0" />
+            <stop offset=".997" stopColor="#fff" stopOpacity=".3" />
+          </linearGradient>
+          <path fill="url(#aiicon-dark-1)" d="M12.136,4.763l1.574,3.591c0.379,0.865,1.07,1.556,1.936,1.936l3.591,1.574 c0.99,0.434,0.99,1.838,0,2.271l-3.591,1.574c-0.865,0.379-1.556,1.07-1.936,1.936l-1.574,3.591c-0.434,0.99-1.838,0.99-2.271,0 L8.29,17.646c-0.379-0.865-1.07-1.556-1.936-1.936l-3.591-1.574c-0.99-0.434-0.99-1.838,0-2.271l3.591-1.574 C7.219,9.91,7.91,9.219,8.29,8.354l1.574-3.591C10.298,3.773,11.702,3.773,12.136,4.763z" />
+          <path fill="url(#aiicon-dark-2)" d="M11,4.521 c0.303,0,0.556,0.166,0.678,0.443l1.574,3.591c0.431,0.983,1.21,1.762,2.193,2.193l3.591,1.574 c0.277,0.122,0.443,0.375,0.443,0.678s-0.166,0.556-0.443,0.678l-3.591,1.574c-0.983,0.431-1.762,1.21-2.193,2.193l-1.574,3.591 c-0.122,0.277-0.375,0.443-0.678,0.443s-0.556-0.166-0.678-0.443l-1.574-3.591c-0.431-0.983-1.21-1.762-2.193-2.193l-3.591-1.574 C2.686,13.556,2.521,13.303,2.521,13s0.166-0.556,0.443-0.678l3.591-1.574c0.983-0.431,1.762-1.21,2.193-2.193l1.574-3.591 C10.444,4.686,10.697,4.521,11,4.521z" />
+          <circle fill="url(#aiicon-dark-3)" cx="19" cy="5" r="2" />
+        </>
       ) : (
-        // Use gradient in light mode
         <g>
           <linearGradient id="aiicon-light-1" x1="6.251" x2="15.749" y1="8.251" y2="17.749" gradientUnits="userSpaceOnUse">
             <stop offset="0" stopColor="#888" stopOpacity="1" />
@@ -182,7 +200,7 @@ Examples:
             type="submit"
             isLoading={reviseProject.isPending}
             disabled={reviseProject.isPending}
-            iconLeft={<AiIcon className="h-4 w-4" />}
+            iconLeft={<AiIcon variant="button" className="h-4 w-4" />}
           >
             {reviseProject.isPending ? t`Regenerating...` : t`Regenerate Board`}
           </Button>

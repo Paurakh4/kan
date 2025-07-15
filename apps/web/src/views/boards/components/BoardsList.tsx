@@ -19,22 +19,22 @@ const AiIcon = (props: React.SVGProps<SVGSVGElement>) => {
       {isDark ? (
         <>
           <linearGradient id="aiicon-dark-1" x1="6.251" x2="15.749" y1="8.251" y2="17.749" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stopColor="#a78bfa" stopOpacity="1" />
-            <stop offset="1" stopColor="#7c3aed" stopOpacity="1" />
+            <stop offset="0" stopColor="#fff" stopOpacity=".6" />
+            <stop offset="1" stopColor="#fff" stopOpacity=".3" />
           </linearGradient>
           <linearGradient id="aiicon-dark-2" x1="6.251" x2="15.749" y1="8.251" y2="17.749" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stopColor="#a78bfa" stopOpacity="1" />
-            <stop offset=".493" stopColor="#a78bfa" stopOpacity="0" />
-            <stop offset=".997" stopColor="#7c3aed" stopOpacity="1" />
+            <stop offset="0" stopColor="#fff" stopOpacity=".6" />
+            <stop offset=".493" stopColor="#fff" stopOpacity="0" />
+            <stop offset=".997" stopColor="#fff" stopOpacity=".3" />
           </linearGradient>
           <linearGradient id="aiicon-dark-3" x1="17.387" x2="20.613" y1="3.387" y2="6.613" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stopColor="#a78bfa" stopOpacity="1" />
-            <stop offset="1" stopColor="#7c3aed" stopOpacity="1" />
+            <stop offset="0" stopColor="#fff" stopOpacity=".6" />
+            <stop offset="1" stopColor="#fff" stopOpacity=".3" />
           </linearGradient>
           <linearGradient id="aiicon-dark-4" x1="17.387" x2="20.613" y1="3.387" y2="6.613" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stopColor="#a78bfa" stopOpacity="1" />
-            <stop offset=".493" stopColor="#a78bfa" stopOpacity="0" />
-            <stop offset=".997" stopColor="#7c3aed" stopOpacity="1" />
+            <stop offset="0" stopColor="#fff" stopOpacity=".6" />
+            <stop offset=".493" stopColor="#fff" stopOpacity="0" />
+            <stop offset=".997" stopColor="#fff" stopOpacity=".3" />
           </linearGradient>
         </>
       ) : (

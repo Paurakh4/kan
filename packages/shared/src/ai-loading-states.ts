@@ -20,29 +20,29 @@ export interface LoadingConfig {
 // Default loading configuration based on performance analysis
 export const defaultLoadingConfig: LoadingConfig = {
   stages: [
-    {
-      message: "Analyzing project...",
-      duration: 2800,
+    { 
+      message: "Analyzing project requirements...", 
+      duration: 1000,
       icon: "🔍"
     },
-    {
-      message: "Generating tasks...",
-      duration: 2800,
+    { 
+      message: "Generating task structure...", 
+      duration: 4000,
       icon: "🏗️"
     },
-    {
-      message: "Creating board...",
-      duration: 2800,
+    { 
+      message: "Creating detailed descriptions...", 
+      duration: 6000,
       icon: "✍️"
     },
-    {
-      message: "Optimizing layout...",
-      duration: 2800,
+    { 
+      message: "Optimizing board layout...", 
+      duration: 2000,
       icon: "🎯"
     },
-    {
-      message: "Almost done...",
-      duration: 2800,
+    { 
+      message: "Finalizing Kanban board...", 
+      duration: 1000,
       icon: "✅"
     }
   ],
