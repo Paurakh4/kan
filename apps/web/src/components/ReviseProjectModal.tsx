@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { useRouter } from "next/router";
 import { t } from "@lingui/core/macro";
 import { HiXMark } from "react-icons/hi2";
@@ -7,10 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import Button from "~/components/Button";
+import ProgressButton from "~/components/ProgressButton";
 import { useModal } from "~/providers/modal";
 import { usePopup } from "~/providers/popup";
 import { api } from "~/utils/api";
 import { useTheme } from "~/providers/theme";
+import { revisionLoadingConfig } from "@kan/shared";
 
 const AiIcon = (props: React.SVGProps<SVGSVGElement> & { variant?: 'default' | 'button' }) => {
   const { activeTheme } = useTheme();
@@ -196,14 +198,15 @@ Examples:
           >
             {t`Cancel`}
           </Button>
-          <Button
+          <ProgressButton
             type="submit"
             isLoading={reviseProject.isPending}
             disabled={reviseProject.isPending}
-            iconLeft={<AiIcon variant="button" className="h-4 w-4" />}
+            icon={<AiIcon variant="button" className="h-4 w-4" />}
+            loadingConfig={revisionLoadingConfig}
           >
-            {reviseProject.isPending ? t`Regenerating...` : t`Regenerate Board`}
-          </Button>
+            {t`Regenerate Board`}
+          </ProgressButton>
         </div>
       </form>
     </div>

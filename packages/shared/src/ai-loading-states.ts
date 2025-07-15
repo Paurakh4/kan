@@ -53,14 +53,70 @@ export const defaultLoadingConfig: LoadingConfig = {
 // Fast loading configuration for cached responses
 export const cachedLoadingConfig: LoadingConfig = {
   stages: [
-    { 
-      message: "Loading cached board...", 
+    {
+      message: "Loading cached board...",
       duration: 50,
       icon: "⚡"
     }
   ],
   totalEstimatedTime: 50,
   progressUpdateInterval: 50
+};
+
+// AI Prompt generation loading configuration
+export const promptLoadingConfig: LoadingConfig = {
+  stages: [
+    {
+      message: "Analyzing context...",
+      duration: 2000,
+      icon: "🔍"
+    },
+    {
+      message: "Generating prompt...",
+      duration: 4000,
+      icon: "✍️"
+    },
+    {
+      message: "Finalizing content...",
+      duration: 2000,
+      icon: "✅"
+    }
+  ],
+  totalEstimatedTime: 8000, // 8 seconds for prompt generation
+  progressUpdateInterval: 500
+};
+
+// Project revision loading configuration
+export const revisionLoadingConfig: LoadingConfig = {
+  stages: [
+    {
+      message: "Analyzing current board...",
+      duration: 2000,
+      icon: "🔍"
+    },
+    {
+      message: "Processing revisions...",
+      duration: 5000,
+      icon: "🔄"
+    },
+    {
+      message: "Regenerating structure...",
+      duration: 4000,
+      icon: "🏗️"
+    },
+    {
+      message: "Applying changes...",
+      duration: 2000,
+      icon: "✨"
+    },
+    {
+      message: "Finalizing board...",
+      duration: 1000,
+      icon: "✅"
+    }
+  ],
+  totalEstimatedTime: 14000, // 14 seconds for project revision
+  progressUpdateInterval: 500
 };
 
 export interface LoadingState {

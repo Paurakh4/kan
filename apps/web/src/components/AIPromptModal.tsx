@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { t } from "@lingui/core/macro";
-import { HiXMark, HiClipboard, HiSparkles, HiArrowPath } from "react-icons/hi2";
+import { HiClipboard, HiArrowPath } from "react-icons/hi2";
 
 import Button from "~/components/Button";
+import ProgressButton from "~/components/ProgressButton";
 import { useModal } from "~/providers/modal";
 import { usePopup } from "~/providers/popup";
 import { api } from "~/utils/api";
 import { useTheme } from "~/providers/theme";
+import { promptLoadingConfig } from "@kan/shared";
 
 interface AIPromptModalProps {
   cardPublicId: string;
@@ -263,22 +265,28 @@ export function AIPromptModal({ cardPublicId }: AIPromptModalProps) {
           <div className="text-center py-6">
             <AiIcon className="mx-auto h-8 w-8 text-light-400 dark:text-dark-500 mb-3" />
             <div className="mb-4">
-              <Button
+              <ProgressButton
                 onClick={handleGeneratePrompt}
-                iconLeft={<AiIcon className="h-4 w-4" />}
+                icon={<AiIcon className="h-4 w-4" />}
+                isLoading={false}
+                disabled={false}
+                loadingConfig={promptLoadingConfig}
               >
                 {t`Generate Prompt`}
-              </Button>
+              </ProgressButton>
             </div>
           </div>
         )}
 
         {isLoading && (
           <div className="text-center py-6">
-            <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-solid border-blue-600 border-r-transparent"></div>
-            <p className="mt-3 text-sm text-light-600 dark:text-dark-600">
-              {t`Analyzing task context...`}
-            </p>
+            <ProgressButton
+              isLoading={true}
+              disabled={true}
+              loadingConfig={promptLoadingConfig}
+            >
+              {t`Generate Prompt`}
+            </ProgressButton>
           </div>
         )}
 
@@ -332,15 +340,16 @@ export function AIPromptModal({ cardPublicId }: AIPromptModalProps) {
       {/* Actions */}
       {hasPrompt && (
         <div className="mt-5 flex justify-between sm:mt-6">
-          <Button
-            variant="secondary"
+          <ProgressButton
             onClick={handleGeneratePrompt}
+            isLoading={isLoading}
             disabled={isLoading}
-            iconLeft={<HiArrowPath className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />}
-            size="sm"
+            icon={<HiArrowPath className="h-4 w-4" />}
+            loadingConfig={promptLoadingConfig}
+            className="!w-[140px]"
           >
             {t`Regenerate`}
-          </Button>
+          </ProgressButton>
 
           <Button
             onClick={handleCopyPrompt}

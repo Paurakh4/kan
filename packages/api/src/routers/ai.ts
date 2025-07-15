@@ -18,6 +18,11 @@ import {
 } from "../config/ai";
 import { safeMarkdownToHTML, ensureHTMLFormat } from "../utils/markdown-to-html";
 import { assertUserInWorkspace } from "../utils/auth";
+import {
+  generatePlanPrompt,
+  generateTaskPrompt,
+  generateRevisionPrompt
+} from "../prompts";
 
 // Temporary inline generateSlug function until import issue is resolved
 const generateSlug = (text: string): string => {
@@ -108,14 +113,14 @@ const getOpenAIClient = () => {
   });
 };
 
-// Generate AI prompt using centralized configuration
+// Generate AI prompt using centralized prompt template system
 const generatePrompt = (projectIdea: string, features: string[]): string => {
-  const config = getAIConfig();
-
-  return interpolatePrompt(config.kanbanPromptTemplate, {
+  const result = generatePlanPrompt({
     projectIdea,
-    features: features.join(", ")
+    features
   });
+
+  return result.prompt;
 };
 
 // Clean generated prompt to remove system instructions and meta-content
@@ -537,20 +542,18 @@ export const aiRouter = createTRPCRouter({
         // Validate user has access to the workspace
         await assertUserInWorkspace(ctx.db, userId, board.workspaceId);
 
-        // Prepare context variables for prompt generation
-        const promptVariables = {
-          projectIdea: board.projectIdea || "No project idea available",
-          boardName: board.name,
-          cardTitle: card.title,
-          cardDescription: card.description || "No description provided",
-        };
-
         // Get AI configuration
         const config = getAIConfig();
         const openai = getOpenAIClient();
 
-        // Generate the meta-prompt using the template
-        const metaPrompt = interpolateTaskPrompt(config.taskPromptTemplate, promptVariables);
+        // Generate the meta-prompt using the centralized prompt template
+        const promptResult = generateTaskPrompt({
+          projectIdea: board.projectIdea || "No project idea available",
+          boardName: board.name,
+          cardTitle: card.title,
+          cardDescription: card.description || "No description provided",
+        });
+        const metaPrompt = promptResult.prompt;
 
         console.log(`[AI] Generating task prompt for card: ${card.title}`);
 
@@ -659,22 +662,14 @@ export const aiRouter = createTRPCRouter({
           cardCount: list.cards?.length || 0,
         })) || [];
 
-        // Create enhanced prompt that combines original context with revision notes
+        // Create enhanced prompt using centralized prompt template
         const config = getAIConfig();
-        const revisionPrompt = `PROJECT REVISION REQUEST
-
-Original Project: ${board.projectIdea}
-Current Board Structure: ${currentStructure.map(list => `${list.title} (${list.cardCount} cards)`).join(", ")}
-
-USER REVISION REQUEST:
-${input.revisionNotes}
-
-INSTRUCTIONS:
-- Maintain the core project vision while incorporating the requested changes
-- Generate an improved board structure based on the revision feedback
-- Ensure the new structure addresses the user's specific requests
-- Keep the professional quality and actionable nature of all cards
-- Include appropriate labels for each card to categorize and organize the work`;
+        const revisionPromptResult = generateRevisionPrompt({
+          projectIdea: board.projectIdea,
+          currentStructure,
+          revisionNotes: input.revisionNotes
+        });
+        const revisionPrompt = revisionPromptResult.prompt;
 
         // Generate new board structure using AI
         const generateWithRetry = async (): Promise<AIResponse> => {
